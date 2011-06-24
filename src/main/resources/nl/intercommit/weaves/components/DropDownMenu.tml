@@ -1,0 +1,38 @@
+<div class="ic_t5-menu" xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd">
+			<t:if test="haslevel1">
+				<ul class="level1" id="root">
+					<t:loop source="menubar" value="level1">
+						<li id="${selectedclass}">
+							<t:if test="level1.image">
+								<a href="${level1.url}"><div style="display:inline; margin-right: 5px;"><img src="${level1.image}"></img></div>${level1.name}</a>
+								<t:parameter name="else">
+									<a href="${level1.url}">${level1.name}</a>
+								</t:parameter>
+							</t:if>
+							<t:if test="haslevel2">
+								<ul class="level2">
+									<t:loop source="menuitems" value="level2">
+										<li>
+											<t:if test="haslevel3">
+												<a href="${level2.url}">${level2.name}<div class="morelevels"> > </div></a>
+												
+												<t:parameter name="else">
+													<a href="${level2.url}">${level2.name}</a>
+												</t:parameter>	
+											</t:if>
+											<t:if test="haslevel3">
+												<ul class="level3">
+													<t:loop source="submenus" value="level3">
+														<li><a href="${level3.url}">${level3.name}</a></li>
+													</t:loop>
+												</ul>
+											</t:if>											
+										</li>
+									</t:loop>
+								</ul>
+							</t:if>
+						</li>
+					</t:loop>
+				</ul>
+			</t:if>
+</div>

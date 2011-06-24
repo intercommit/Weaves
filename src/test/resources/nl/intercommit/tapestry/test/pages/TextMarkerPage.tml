@@ -1,0 +1,6 @@
+<html  xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd"
+      xmlns:p="tapestry:parameter">
+	<div id="result">
+		<t:ic-t5.textmarker value="message" keywords="words" paddingSize="15" maxLength="maxLength"></t:ic-t5.textmarker>
+	</div>
+</html>

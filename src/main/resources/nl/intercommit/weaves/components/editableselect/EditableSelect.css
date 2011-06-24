@@ -1,0 +1,11 @@
+ul.select-list { 
+	list-style: none; 
+	position:absolute; 
+	z-index:99; 
+	padding-left: 0px;
+	margin-top: 0px;
+	border: outset 1px; 
+}
+ul.select-list li { padding-left: 3px; cursor:pointer; color:black; background-color:white; }
+ul.select-list li.highlight { background-color:#3875D7; color:#dddddd; }
+img.select-dropdown { position: absolute; display:inline; }

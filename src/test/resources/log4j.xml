@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%5p %d{ISO8601} %c - %m%n" />
+		</layout>
+		
+	</appender>
+
+	<category name="org.apache.tapestry5">
+    	<priority value="INFO"/>
+   	</category>
+   	
+   	<category name="tapestry.events">
+    	<priority value="WARN"/>
+   	</category>
+   	  	<category name="tapestry.transformer">
+    	<priority value="WARN"/>
+   	</category>
+   	
+   	   	<category name="tapestry.render">
+    	<priority value="WARN"/>
+   	</category>
+   	
+   	<!--  hibernate is also a super logger.. if debug is on. -->
+	<category name="org.hibernate">
+    	<priority value="WARN"/>
+   	</category>
+   	
+   	<!-- Outputs a list of pages, components and mixins at startup. -->
+	<category name="org.apache.tapestry5.services.TapestryModule.ComponentClassResolver">
+    	<priority value="INFO"/>
+   	</category>
+
+	<!-- # Outputs startup statistics; elapsed time to setup and initialize the registry, and a list of
+	# available services. -->
+	<category name="org.apache.tapestry5.TapestryFilter">
+    	<priority value="INFO"/>
+   	</category>
+
+	<root>
+		<priority value="DEBUG" />
+		<appender-ref ref="ConsoleAppender" />
+	</root>
+
+</log4j:configuration> 
+    

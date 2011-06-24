@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+          "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+		<property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
+		<property name="connection.url">jdbc:hsqldb:mem:t5test</property>
+		<property name="connection.username">sa</property>
+		<property name="connection.password"></property>
+		<property name="dialect">org.hibernate.dialect.HSQLDialect</property>
+		<property name="current_session_context_class">thread</property>
+		<property name="show_sql">true</property>
+		<property name="hbm2ddl.auto">update</property>
+		<property name="connection.autocommit">true</property>
+		<property name="hibernate.generate_statistics">false</property>
+	</session-factory>
+</hibernate-configuration>

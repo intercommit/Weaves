@@ -1,0 +1,10 @@
+<html  xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd"
+      xmlns:p="tapestry:parameter">
+
+    
+
+	<h4>Confirmation dialog page </h4>
+	<p/>
+	
+    <t:actionlink page="confirmpage" t:mixins="ic-t5/Confirm">click here</t:actionlink> 
+</html>

@@ -1,0 +1,25 @@
+<div xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" id="pagedgrid">
+	
+	<div t:id="grid"/>
+	<div id="noGridBottom"/>
+	<t:if test="pagedSource.availablerows" negate="true">
+		<div class="ic_t5-pagedgrid-noresults">${message:pagedgrid-no-result}</div>
+	</t:if>
+	
+	<t:block id="rowCell">
+		${rowIndex}
+	</t:block>
+	
+	<t:block id="checkboxCell">
+		<t:form><t:ck.AjaxCheckbox t:id="checkBox" value="checked" context="RowIdentifier"/></t:form> 
+	</t:block>
+	
+	<t:block id="checkboxHeader">
+		<t:form><t:ck.AjaxCheckbox value="checkall" t:id="checkall"/></t:form> 
+	</t:block>
+
+  	<t:block>
+		<div t:id="pagedpager"/>
+	</t:block>
+	
+</div>

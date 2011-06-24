@@ -1,0 +1,12 @@
+<div class="ic-t5-switch" id="${clientid}" xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd"
+      xmlns:p="tapestry:parameter">
+	
+	<t:body/>
+	
+	<t:delegate to="activeBlock">
+	</t:delegate>
+	
+	<t:block t:id="default">
+		<t:outputraw value="default"></t:outputraw>
+	</t:block>
+</div>
