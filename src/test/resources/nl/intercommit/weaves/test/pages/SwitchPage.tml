@@ -1,0 +1,19 @@
+<html  xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd"
+      xmlns:p="tapestry:parameter">
+
+	<t:weave.switch value="testvalue" defaultHTML="html">
+		<t:parameter name="ONE" >
+			one!
+		</t:parameter>
+		
+		<t:parameter name="two" >
+			two!
+		</t:parameter>
+		
+		<t:parameter name="someother" >
+			someother...
+		</t:parameter>
+		
+	</t:weave.switch>
+	
+</html>

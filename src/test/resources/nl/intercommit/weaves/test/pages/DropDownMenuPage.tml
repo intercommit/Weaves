@@ -1,0 +1,7 @@
+<html  xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd"
+      xmlns:p="tapestry:parameter">
+
+    <t:weave.DropDownMenu menu="menu">
+    </t:weave.DropDownMenu>
+   
+</html>

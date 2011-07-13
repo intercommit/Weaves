@@ -1,0 +1,16 @@
+<html  xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd"
+      xmlns:p="tapestry:parameter">
+
+    
+
+	<h4>Editable select page </h4>
+	<p/>
+	
+    <t:form t:id="form">
+   		<t:errors/>
+   		<t:weave.EditableSelectBox items="list" value="item"/>
+   		
+   		<t:submit/>
+   		
+   	</t:form> 
+</html>

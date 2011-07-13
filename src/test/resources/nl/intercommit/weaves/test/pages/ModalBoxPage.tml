@@ -1,0 +1,13 @@
+<html  xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd"
+      xmlns:p="tapestry:parameter">
+
+    
+	<h4>ModalBox page </h4>
+	<p/>
+	
+    <t:weave.ModalBox t:type='event'>Click To See Inline Modal Box</t:weave.ModalBox>
+     
+    <t:block t:id='messageBlock'>
+       This is a simple Message
+    </t:block> 	
+</html>
