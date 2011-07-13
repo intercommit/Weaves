@@ -1,16 +1,32 @@
+/*  Copyright 2011 InterCommIT b.v.
+*
+*  This file is part of the "Weaves" project hosted on https://github.com/intercommit/Weaves
+*
+*  Weaves is free software: you can redistribute it and/or modify
+*  it under the terms of the GNU Lesser General Public License as published by
+*  the Free Software Foundation, either version 3 of the License, or
+*  any later version.
+*
+*  Weaves is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU Lesser General Public License for more details.
+*
+*  You should have received a copy of the GNU Lesser General Public License
+*  along with Weaves.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
 package util;
 
 import java.io.File;
 import java.net.URISyntaxException;
 
 import junit.framework.Assert;
-
-import nl.intercommit.tapestry.test.entities.Person;
+import nl.intercommit.weaves.test.entities.Person;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 
