@@ -1,0 +1,30 @@
+Weaves; a Tapestry 5.2 component module featuring new components and multiple database support.
+
+Provided components in this library:
+
+- PagedGrid
+- PopupWindow
+- Switch
+- TextMarker
+- ModalBox
+- Hoverlink
+- EditableSelectBox
+- DropDownMenu
+
+Provided Mixins in this library:
+
+- Confirm
+	A javascript popup dialog to be used for confirming actions on urls
+
+
+Provided Services in this library:
+
+- HibernateMultiSessionManager
+	A multi session / multi database service
+
+	
+There are still some TODO's left in the code, but 95% is working fine.
+
+-- Building --
+
+Use maven as such: mvn clean install , it will then build and test the library and place it in your local repository. From there you can create a dependency in your own Tapestry project and Weaves will be auto-loaded by Tapestry.

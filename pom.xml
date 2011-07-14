@@ -3,21 +3,25 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.intercommit</groupId>
 	<artifactId>weaves</artifactId>
-	<name>InterCommIT Tapestry 5.2 Component Library</name>
-	<version>1.0.0-SNAPSHOT</version>
+	<name>Weaves</name>
+	<version>1.0.0</version>
 
-	<description>A Tapestry 5.2 module featuring components and multiple database support</description>
+	<description>Weaves; a Tapestry 5.2 component module featuring new components and multiple database support.</description>
 
 	<organization>
 		<name>InterCommIT b.v.</name>
 		<url>http://www.intercommit.nl</url>
 	</organization>
+	
+	<properties>
+		<tapestry.version>5.2.4</tapestry.version>
+	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.tapestry</groupId>
 			<artifactId>tapestry-core</artifactId>
-			<version>5.2.4</version>
+			<version>${tapestry.version}</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
@@ -56,7 +60,7 @@
 		<dependency>
 			<groupId>org.apache.tapestry</groupId>
 			<artifactId>tapestry-test</artifactId>
-			<version>5.2.4</version>
+			<version>${tapestry.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -117,7 +121,7 @@
 				<configuration>
 					<archive>
 						<manifestEntries>
-							<Tapestry-Module-Classes>nl.intercommit.tapestry.services.InterCommitModule</Tapestry-Module-Classes>
+							<Tapestry-Module-Classes>nl.intercommit.weaves.services.WeavesModule</Tapestry-Module-Classes>
 						</manifestEntries>
 					</archive>
 				</configuration>
