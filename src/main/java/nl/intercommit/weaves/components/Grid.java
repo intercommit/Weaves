@@ -22,12 +22,9 @@ import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.annotations.SetupRender;
 /**
- * This class is needed because its the only way to override the default grid pager component
- * Or you have a better idea ?
+ * This class is needed because we needed to override the Pager component
  * 
  * @see org.apache.tapestry5.corelib.components.Grid
- * 
- * @author antalk
  *
  */
 public class Grid extends org.apache.tapestry5.corelib.components.Grid {

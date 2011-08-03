@@ -37,8 +37,6 @@ import org.chenillekit.tapestry.core.components.Window;
  * Ajax popup window based on chenillekit window {@link Window} 
  * 
  * Must have a zoneName parameter, this will allow the window to listen to zone update events and show this window.
- * 
- * @author antalk
  *
  */
 @Import(library={"PopupWindow.js"})

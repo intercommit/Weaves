@@ -38,8 +38,6 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * href='http://okonet.ru/projects/modalbox/index.html'>ModalBox</a> for details
  * This component uses version 1.5.5
  * 
- * @author Taha Hafeez
- * @contributor antalk
  * @notes copied from : http://tapestry.1045711.n5.nabble.com/Modalbox-Integration-Example-td4248936.html#a4257039
  * 
  */
@@ -118,7 +116,6 @@ public class ModalBox implements ClientElement {
 		if (EVENT_TYPE.equalsIgnoreCase(type)) {
 			link = resources.createEventLink(event, contextArray);
 		} else { // if(PAGE_TYPE.equals(type)){
-			System.out.println("Page Link");
 			link = pageRenderLinkSource.createPageRenderLinkWithContext(
 					pageName, contextArray);
 		}

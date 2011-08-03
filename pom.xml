@@ -14,7 +14,7 @@
 	</organization>
 	
 	<properties>
-		<tapestry.version>5.2.4</tapestry.version>
+		<tapestry.version>5.2.6</tapestry.version>
 	</properties>
 
 	<dependencies>

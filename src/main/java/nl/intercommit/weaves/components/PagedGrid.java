@@ -70,11 +70,6 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * Also when using checkboxes, make sure the rowidentifier function returns a unique index for the datasource, in case
  * of hibernate this will be a primary key so not a problem. But in case of a Collection the source may have been altered in 
  * the meantime and thus give back the wrong rows.
- * 
- * TODO: you cannot use 2 pagedgrid at a time on one page(!!)
- * well.. you can but one of them is not working correctly..
- * 
- * @author antalk
  *
  */
 @Events(value=PagedGrid.ROW_SELECTED_EVENT)

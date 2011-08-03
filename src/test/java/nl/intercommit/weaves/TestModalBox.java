@@ -28,7 +28,7 @@ public class TestModalBox extends WeaveTestCase {
 	public void testModalBox() {
 		org.apache.tapestry5.dom.Document dom = getTester().renderPage("ModalBoxPage");
 		
-		System.err.println(dom);
+		//System.err.println(dom);
 		
 		assertNotNull(dom);
 		assertNull(dom.getElementById("t-error"));

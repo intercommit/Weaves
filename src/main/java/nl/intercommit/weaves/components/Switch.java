@@ -29,10 +29,7 @@ import org.apache.tapestry5.ioc.annotations.Inject;
 /**
  * A switch component for enum types or anything based on a object array
  * Items in the list should have a decent toString method
- * 
- * @author antalk
  */
-
 @SupportsInformalParameters
 public class Switch extends BasicClientElement {
 

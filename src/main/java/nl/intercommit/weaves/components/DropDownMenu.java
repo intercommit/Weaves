@@ -57,6 +57,8 @@ public class DropDownMenu {
 	@Property
 	private MenuItem level3;
 	
+	private boolean matched = false;
+	
 	@SetupRender
 	private void initJavaScript() {
 		js.addScript("initMenu();", "");
@@ -92,7 +94,7 @@ public class DropDownMenu {
 	
 	public boolean getHasLevel2() {
 		if (getHasLevel1()) {
-			return menu.get(level1).keySet() != null;
+			return menu.get(level1) != null;
 		} 
 		return false;
 	}
@@ -110,15 +112,17 @@ public class DropDownMenu {
 			if (matchesRequest(topLevel,topLevel)) {
 				return "toplevelselected";
 			}
-			for (MenuItem level2: menu.get(topLevel).keySet()) {
-				if (matchesRequest(level2,topLevel)) {
-					return "toplevelselected";
-				}
-				if (menu.get(topLevel).get(level2) !=null ) {
-				
-					for (Object level3: menu.get(topLevel).get(level2).toArray()) {
-						if (matchesRequest((MenuItem)level3,topLevel)) {
-							return "toplevelselected";
+			if (menu.get(topLevel) != null) {
+				for (MenuItem level2: menu.get(topLevel).keySet()) {
+					if (matchesRequest(level2,topLevel)) {
+						return "toplevelselected";
+					}
+					if (menu.get(topLevel).get(level2) !=null ) {
+					
+						for (Object level3: menu.get(topLevel).get(level2).toArray()) {
+							if (matchesRequest((MenuItem)level3,topLevel)) {
+								return "toplevelselected";
+							}
 						}
 					}
 				}
@@ -128,13 +132,18 @@ public class DropDownMenu {
 	}
 
 	private boolean matchesRequest(final MenuItem menu,final MenuItem currentLevel) {
-		
+		if (matched) {
+			return false;
+		}
+		String basePath = menu.getUrl().getBasePath();
 		String reqPath = request.getPath();
 		if (!request.getContextPath().equals("")) {
-			reqPath = request.getContextPath() + reqPath;
+			basePath = basePath.substring(request.getContextPath().length());
 		}
-		return (menu.getUrl().getBasePath().startsWith(reqPath) &&
-				currentLevel == level1) ;
+		matched = (basePath.startsWith(reqPath) &&
+					currentLevel == level1 &&
+					reqPath.length() > 1) ;
+		return matched;
 	}
 	
 }

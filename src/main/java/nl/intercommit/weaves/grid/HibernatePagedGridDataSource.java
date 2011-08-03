@@ -30,8 +30,6 @@ import org.hibernate.criterion.Order;
  * 
  * When you want to enable checkboxes on the grid, the only allowed entitytypes are the ones with a Long as primary key ! 
  * Otherwise you can also use composite keys
- * 
- * @author antalk
  *
  */
 public class HibernatePagedGridDataSource extends PagedGridDataSource {

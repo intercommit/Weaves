@@ -18,11 +18,6 @@
 */
 package nl.intercommit.weaves.grid;
 
-/*
- * 
- * TODO: check Is there some existing library forthis ??
- * 
- */
 public class CollectionFilter {
 
 	private String name;

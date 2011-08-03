@@ -24,7 +24,7 @@ import org.apache.tapestry5.test.PageTester;
 
 public abstract class WeaveTestCase extends TestCase {
 
-	private PageTester tester;
+	private static PageTester tester;
 
 	@Override
 	protected void setUp() throws Exception {
@@ -36,9 +36,11 @@ public abstract class WeaveTestCase extends TestCase {
 	
 	@Override
 	protected void tearDown() throws Exception {
+		/*
 		if (tester != null) {
 			tester.shutdown();
 		}
+		*/
 	}
 	
 	public PageTester getTester() {

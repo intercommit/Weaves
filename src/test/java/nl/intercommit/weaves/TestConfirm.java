@@ -29,7 +29,7 @@ public class TestConfirm extends WeaveTestCase {
 		assertNull(dom.getElementById("t-error"));
 		assertFalse(dom.toString().contains("<h1 class=\"t-exception-report\">"));
 		
-		System.err.println(dom);
+		//System.err.println(dom);
 		
 		assertNotNull(dom.getElementById("actionlink"));
 		assertTrue(dom.toString().contains("new Confirm('actionlink', 'Are you sure?')"));

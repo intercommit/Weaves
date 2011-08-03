@@ -97,9 +97,6 @@ public class PagedGridPager
 		final Element divPagerRows = writer.element("div", "class","paged_rows");
 
 		for (final Long size: pagination) {
-			
-			
-			
 			/*
 			 * Generate an eventlink for the container which normally is the org.apache.tapestry5.corelib.components.Grid component 
 			 * and generate an event for it, the PagedGrid for example catches this event..

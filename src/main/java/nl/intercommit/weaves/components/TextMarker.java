@@ -23,10 +23,10 @@ import java.util.List;
 
 import nl.intercommit.weaves.base.BasicClientElement;
 
-import org.apache.tapestry5.annotations.BeginRender;
 import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.annotations.Property;
+import org.apache.tapestry5.annotations.SetupRender;
 /**
  * Marks specific keywords in a text with a yellow background.
  * 
@@ -54,7 +54,7 @@ public class TextMarker extends BasicClientElement {
 	@Property
 	private Match match;
 	
-	@BeginRender
+	@SetupRender
 	public void makeMatches() {
 		
 		final String[] lowerCaseKeywords= new String[keywords.length]; 

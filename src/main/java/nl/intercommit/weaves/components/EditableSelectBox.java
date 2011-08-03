@@ -70,7 +70,6 @@ public class EditableSelectBox extends AbstractField {
     @Inject
     private ComponentDefaultProvider defaultProvider;
 
-    // Maybe this should default to property "<componentId>Model"?
     /**
      * The model used to identify the option groups and options to be presented to the user. This can be generated
      * automatically for Enum types.

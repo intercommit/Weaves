@@ -57,8 +57,6 @@ public class HoverlinkStreamResponse implements StreamResponse {
 
 	@Override
 	public void prepareResponse(Response response) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	private String encodeHTML(String s)

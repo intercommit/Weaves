@@ -29,8 +29,6 @@ import org.apache.tapestry5.grid.SortConstraint;
  * 
  * Warning: the preparedResults are internally (Tapestry) cached, each request for a row will return a new implementation of THIS class.
  * Meaning that you cannot store any values in this class!
- * 
- * @author antalk
  *
  */
 public abstract class PagedGridDataSource implements GridDataSource {
