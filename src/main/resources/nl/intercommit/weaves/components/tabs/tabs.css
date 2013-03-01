@@ -1,0 +1,56 @@
+/*
+	http://exploding-boy.com/images/cssmenus2/menus.html
+*/
+
+.weaves-tab {
+	width:100%;
+	font-size:93%;
+	line-height:normal;
+}
+.weaves-tab ul {
+	margin:0;
+	padding:10px 10px 0 0;
+	list-style:none;
+}
+.weaves-tab li {
+	display:inline;
+	margin:0;
+	padding:0;
+}
+.weaves-tab a {
+	float:left;
+	background:url("tableft10.gif") no-repeat left top;
+	margin:0;
+	padding:0 0 0 4px;
+	text-decoration:none;	
+	background-position:0% -42px;
+}
+.weaves-tab a span {
+	display:block;
+	float:left;
+	background:url("tabright10.gif") no-repeat right top;
+	color: gray;	
+	background-position:100% -42px;
+	border: outset 1px gray;
+}
+
+#weaves-tab a:hover span {
+	color:#FFF;
+}
+.weaves-tab a:hover, .weaves-tab .selected a  {
+	background-position:0% 0px;
+}
+.weaves-tab a:hover span, .weaves-tab .selected a span  {
+	background-position:100% 0px;
+}
+
+.panel{
+	border:1px solid #bcd2e6;
+	padding:10px;
+	width:400px;
+}
+
+.weaves-tab-selected a span{
+	background-color: gray;
+	color: white;
+}

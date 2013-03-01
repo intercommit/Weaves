@@ -19,21 +19,25 @@
 package nl.intercommit.weaves.components;
 
 import org.apache.tapestry5.BindingConstants;
+import org.apache.tapestry5.ClientElement;
 import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.annotations.SetupRender;
 /**
  * This class is needed because we needed to override the Pager component
  * 
  * @see org.apache.tapestry5.corelib.components.Grid
- *
+ * @tapestrydoc
  */
-public class Grid extends org.apache.tapestry5.corelib.components.Grid {
+public class Grid extends org.apache.tapestry5.corelib.components.Grid implements ClientElement  {
 
 	@Parameter(defaultPrefix = BindingConstants.LITERAL,allowNull=true)
 	private String nonSortable;
 	
-	@Parameter(required=true)
+	@Parameter(required=false)
 	private PagedGridPager pagedpager;
+	
+	@Parameter(required=true,defaultPrefix=BindingConstants.LITERAL)
+	private String clientId;
 	
 	public Object getPagerTop() {
 		 Object o = super.getPagerTop();
@@ -52,9 +56,16 @@ public class Grid extends org.apache.tapestry5.corelib.components.Grid {
 		if (nonSortable != null) {
 			final String[] columns = nonSortable.split(",");
 			for (final String column: columns) {
-				getDataModel().get(column).sortable(false);
+				if (getDataModel().getPropertyNames().contains(column)) {
+					getDataModel().get(column).sortable(false);
+				}
 			}
 		}
+	}
+
+	@Override
+	public String getClientId() {
+		return clientId;
 	}
 
 }

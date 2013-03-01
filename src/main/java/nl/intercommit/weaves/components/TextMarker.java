@@ -29,7 +29,7 @@ import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.annotations.SetupRender;
 /**
  * Marks specific keywords in a text with a yellow background.
- * 
+ * @tapestrydoc
  */
 @Import(stylesheet="TextMarker.css")
 public class TextMarker extends BasicClientElement {

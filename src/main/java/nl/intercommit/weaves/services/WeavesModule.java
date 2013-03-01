@@ -22,24 +22,33 @@ import nl.intercommit.weaves.hibernate.HibernateMultiSessionManager;
 import nl.intercommit.weaves.hibernate.HibernateMultiSessionManagerImpl;
 import nl.intercommit.weaves.hibernate.SessionFactorySource;
 import nl.intercommit.weaves.hibernate.SessionFactorySourceImpl;
+import nl.intercommit.weaves.services.internal.JQueryJavaScriptStack;
 
 import org.apache.tapestry5.ioc.Configuration;
+import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.ScopeConstants;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Scope;
 import org.apache.tapestry5.ioc.services.PerthreadManager;
 import org.apache.tapestry5.services.LibraryMapping;
+import org.apache.tapestry5.services.javascript.JavaScriptStack;
 
 public class WeavesModule {
 	
     public static void contributeComponentClassResolver(
              Configuration<LibraryMapping> configuration){
-        configuration.add(new LibraryMapping("weave", "nl.intercommit.weaves"));
+        configuration.add(new LibraryMapping("weaves", "nl.intercommit.weaves"));
     }
     
    public static void bind(ServiceBinder binder) {
       binder.bind(SessionFactorySource.class, SessionFactorySourceImpl.class);
    }
+   
+   public static void contributeJavaScriptStackSource(MappedConfiguration<String, JavaScriptStack>
+  	configuration) {
+        configuration.addInstance("jquery", JQueryJavaScriptStack.class);
+  } 
+
    
    @Scope(ScopeConstants.PERTHREAD)
    public static HibernateMultiSessionManager buildHibernateMultiSessionManager(

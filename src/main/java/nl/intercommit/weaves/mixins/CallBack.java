@@ -14,34 +14,36 @@
 *
 *  You should have received a copy of the GNU Lesser General Public License
 *  along with Weaves.  If not, see <http://www.gnu.org/licenses/>.
+*
 */
-package nl.intercommit.weaves.base;
+package nl.intercommit.weaves.mixins;
 
 import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.ClientElement;
-import org.apache.tapestry5.annotations.Environmental;
+import org.apache.tapestry5.annotations.AfterRender;
+import org.apache.tapestry5.annotations.InjectContainer;
 import org.apache.tapestry5.annotations.Parameter;
+import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
-public abstract class BasicClientElement implements ClientElement {
+public class CallBack {
 	
-	private String assignedClientId;
+	@Parameter(allowNull=true)
+	private Object clickContext;
 	
-	@Parameter(value = "prop:componentResources.id", defaultPrefix = BindingConstants.LITERAL)
-	private String clientId;
+	@Parameter(allowNull=false,defaultPrefix=BindingConstants.LITERAL,required=true)
+	private String callback;
 	
-	@Environmental
-	private JavaScriptSupport javascriptSupport;
-	
-	@SuppressWarnings("unused")
-	private void setupRender() {
-		assignedClientId = javascriptSupport.allocateClientId(clientId);
-	}
-	
-	public String getClientId() {
-		return assignedClientId;
-	}
-	
-	
+	@Inject
+    private JavaScriptSupport js;
 
+    @InjectContainer
+    private ClientElement element;
+
+    @AfterRender
+    public void afterRender() {
+    	    js.addScript(String.format("$('%s').observe('click', function(event) {"+ 
+    	    		callback + "(event,"+clickContext+");	});",
+                    element.getClientId()));
+    }
 }

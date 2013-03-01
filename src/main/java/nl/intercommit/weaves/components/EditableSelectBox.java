@@ -53,6 +53,9 @@ import org.apache.tapestry5.services.ValueEncoderSource;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 import org.apache.tapestry5.util.EnumSelectModel;
 
+/**
+ * @tapestrydoc
+ */
 @Import(library="editableselect/EditableSelect.js",stylesheet="editableselect/EditableSelect.css")
 public class EditableSelectBox extends AbstractField {
 	

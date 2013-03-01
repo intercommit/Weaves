@@ -37,6 +37,8 @@ import org.apache.tapestry5.services.AssetSource;
  * 
  * TODO: support for zones
  * TODO: should be able to remove the 'row' column ?
+ * 
+ * @tapestrydoc
  */
 @Events({InternalConstants.GRID_INPLACE_UPDATE + " (internal event)","pagesize"})
 public class PagedGridPager
@@ -89,31 +91,30 @@ public class PagedGridPager
 		}
 		
 		writePageLink(divElement,currentPage,"refresh");
-		
-		
 		writer.end();
 		
-		
 		final Element divPagerRows = writer.element("div", "class","paged_rows");
-
+		divPagerRows.raw(messages.get("records_per_page")+" : ");
+		
+		final Link link = resources.getContainer().getComponentResources().createEventLink("pagesize","$pg$");
+		Element select = writer.element("select","class","t-data-grid-pageselect","onchange","changePageSize('"+link.toURI()+"',this);");
+		
 		for (final Long size: pagination) {
 			/*
 			 * Generate an eventlink for the container which normally is the org.apache.tapestry5.corelib.components.Grid component 
 			 * and generate an event for it, the PagedGrid for example catches this event..
 			 */
-			
-			final Link link = resources.getContainer().getComponentResources().createEventLink("pagesize", size.intValue());
-			
-			Element aElement = null;
 			if (size.intValue() == rowsPerPage) {
-				aElement = divPagerRows.element("span","class","current");
+				select = select.element("option","value",""+size,"selected","selected");
 			} else {
-				aElement = divPagerRows.element("a","href", link.toString());
+				select = select.element("option","value", ""+size);
 			}
-			aElement.text(""+size);
+			select.text(""+size);
 		}
-		writer.end();
-        writer.end();
+		writer.end(); // selectbox
+		
+		writer.end(); // paged_rows div
+        writer.end(); // t-data-grid-pager div
 
 	}
 

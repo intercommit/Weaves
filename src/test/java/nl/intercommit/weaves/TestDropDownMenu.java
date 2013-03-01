@@ -39,7 +39,7 @@ public class TestDropDownMenu extends WeaveTestCase {
 		
 		assertNotNull(dom.getElementById("root"));
 		
-		assertEquals("<ul id=\"root\" class=\"level1\"><li id=\"none\"><a href=\"/foo/pagedgridpage\"><div style=\"display:inline; margin-right: 5px;\"><img src=\"/images/menu1.png\"/></div>top1</a><ul class=\"level2\"><li><a href=\"/foo/dropdownmenupage\">item1</a></li><li><a href=\"/foo/dropdownmenupage\">item2</a></li></ul></li><li id=\"none\"><a href=\"/foo/switchpage\">top2</a><ul class=\"level2\"><li><a href=\"/foo/dropdownmenupage\">item1</a></li><li><a href=\"/foo/dropdownmenupage\">item2<div class=\"morelevels\"> &gt; </div></a><ul class=\"level3\"><li><a href=\"/foo/dropdownmenupage\">sub1</a></li><li><a href=\"/foo/dropdownmenupage\">sub2</a></li><li><a href=\"/foo/dropdownmenupage\">sub3</a></li></ul></li></ul></li></ul>",dom.getElementById("root").toString());
+		assertEquals("<ul id=\"root\" class=\"level1\"><li id=\"none\"><a href=\"/foo/pagedgridpage\"><div style=\"display:inline; margin-right: 5px;\"><img src=\"/images/menu1.png\"/></div>top1</a><ul class=\"level2\"><li><a href=\"/foo/dropdownmenupage\">item1</a></li><li><a href=\"/foo/dropdownmenupage\">item2</a></li></ul></li><li id=\"toplevelselected\"><a href=\"/foo/switchpage\">top2</a><ul class=\"level2\"><li><a href=\"/foo/dropdownmenupage\">item1</a></li><li><a href=\"/foo/dropdownmenupage\">item2<div class=\"morelevels\"> &gt; </div></a><ul class=\"level3\"><li><a href=\"/foo/dropdownmenupage\">sub1</a></li><li><a href=\"/foo/dropdownmenupage\">sub2</a></li><li><a href=\"/foo/dropdownmenupage\">sub3</a></li></ul></li></ul></li></ul>",dom.getElementById("root").toString());
 		
 	}
 	

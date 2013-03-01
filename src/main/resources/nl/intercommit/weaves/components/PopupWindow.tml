@@ -2,7 +2,9 @@
 
 	<div t:id="window">
 		<t:zone t:id="zone" id="prop:zonename">
-			<t:body/>
+			<div style="padding: 5px;">
+				<t:body/>
+			</div>
 		</t:zone>
 	</div>	
 </div>

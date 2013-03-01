@@ -24,32 +24,40 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import nl.intercommit.weaves.base.BasicClientElement;
 import nl.intercommit.weaves.grid.CollectionPagedGridDataSource;
 import nl.intercommit.weaves.grid.HibernatePagedGridDataSource;
 import nl.intercommit.weaves.grid.PagedGridDataSource;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.tapestry5.Asset2;
 import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.Block;
 import org.apache.tapestry5.ComponentResources;
+import org.apache.tapestry5.EventContext;
 import org.apache.tapestry5.MarkupWriter;
 import org.apache.tapestry5.PersistenceConstants;
 import org.apache.tapestry5.PropertyOverrides;
 import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Component;
-import org.apache.tapestry5.annotations.Events;
 import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.OnEvent;
 import org.apache.tapestry5.annotations.Parameter;
+import org.apache.tapestry5.annotations.Path;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.annotations.SupportsInformalParameters;
+import org.apache.tapestry5.beaneditor.BeanModel;
 import org.apache.tapestry5.corelib.components.Grid;
+import org.apache.tapestry5.corelib.components.Zone;
 import org.apache.tapestry5.ioc.Messages;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.internal.util.TapestryException;
 import org.apache.tapestry5.ioc.services.TypeCoercer;
+import org.apache.tapestry5.services.javascript.InitializationPriority;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
+import org.chenillekit.tapestry.core.components.AjaxCheckbox;
 /**
  * Custom component PagedGrid, embeds the usual tapestry grid plus extra paging row and eventhandlers for paging
  * Can also be extended with a checkable checkbox column ! 
@@ -58,7 +66,6 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * 
  * 1. Each row gets highlighted when clicked on
  * 2. Does not query the database for all rows, only a subset with limit
- * 3. Emits a 'pagedgrid:selectrow' javascript event when a row has been selected
  * 
  * Caution:
  * 
@@ -71,13 +78,16 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * of hibernate this will be a primary key so not a problem. But in case of a Collection the source may have been altered in 
  * the meantime and thus give back the wrong rows.
  *
+ *
+ * @tapestrydoc
  */
-@Events(value=PagedGrid.ROW_SELECTED_EVENT)
-@Import(library={"PagedGridScript.js"},stylesheet="PagedGrid.css")
+@Import(library={"pagedgrid/PagedGridScript.js","pagedgrid/jquery.chromatable.js"},stylesheet={"pagedgrid/PagedGrid.css"},stack="jquery")
 @SupportsInformalParameters
-public class PagedGrid {
+public class PagedGrid extends BasicClientElement {
 	
-	public final static String ROW_SELECTED_EVENT = "pagedgrid:selectrow";
+	
+	@Component
+	private nl.intercommit.weaves.components.Grid childrenGrid;
 	
 	@Parameter(required = true)
     private PagedGridDataSource pagedsource;
@@ -97,14 +107,26 @@ public class PagedGrid {
 	@Parameter(value = "false", defaultPrefix = BindingConstants.LITERAL)
 	private boolean checkBoxes;
 	
-	@Property
-	private boolean checkall;
+	/**
+	 * Parameter that tells that the parent rows have children
+	 */
+	@Parameter(value = "false", defaultPrefix = BindingConstants.LITERAL)
+	private boolean tree;
 	
-	@Property
-	private boolean checked;
+	@Parameter(value="500",required=false,defaultPrefix=BindingConstants.LITERAL)
+	private String maxHeight;
+	
+	@Parameter(value="false",defaultPrefix=BindingConstants.LITERAL)
+	private boolean hoverAnimation;
+	
+	@Component
+	private AjaxCheckbox checkall;
+	
+	@Component
+	private Zone expansionZone;
 	
 	@Persist(PersistenceConstants.SESSION)
-	private Class rowIdClass;
+	private Class<?> rowIdClass;
 	
 	//session persistence because it lives over multiple AJAX requests.
 	@Persist(PersistenceConstants.SESSION)
@@ -114,6 +136,9 @@ public class PagedGrid {
 	@Persist(PersistenceConstants.SESSION)
 	private int overriddenRowsPerPage;
 	
+	@Persist(PersistenceConstants.SESSION)
+	private boolean checkedAll;
+	
 	private int rowIndex;
 	
 	@Inject
@@ -122,22 +147,25 @@ public class PagedGrid {
 	@Inject
     private JavaScriptSupport scriptSupport;
 	
-	@Inject
-	private Block rowCell;
+	@Property
+	@Inject @Path("pagedgrid/expand.png")
+	private Asset2 expandImage;
 	
-	@Inject
-	private Block checkboxCell;
+	@Property
+	@Inject	@Path("pagedgrid/collapse.png")
+	private Asset2 collapseImage;
 	
-	@Inject
-	private Block checkboxHeader;
+	@Property
+	@Inject	@Path("pagedgrid/branch.png")
+	private Asset2 branchImage;
 	
-	@Inject
-	private TypeCoercer coerer;
+	@Property
+	private List<?> children;
 	
 	@Component(
 			inheritInformalParameters=true,
-			publishParameters="row,exclude,pagerposition,include,columnIndex,model,sortModel,nonSortable",
-	        parameters = {
+			publishParameters="row,columnIndex,include,exclude,model,sortModel,nonSortable,pagerposition",
+			parameters = {
 					"source=pagedsource",
                     "add=prop:addedRow",
                     "rowsPerPage=prop:selectedrowsperpage",
@@ -145,8 +173,9 @@ public class PagedGrid {
                     "reorder=prop:ordering",
                     "overrides=customoverrides",
                     "rowclass=rowclass",
-                    "pagedpager=pagedpager"
-                    }
+                    "pagedpager=pagedpager",
+                    "pagerposition=literal:bottom",
+                    "clientId=clientId"}
             )
     private nl.intercommit.weaves.components.Grid grid;
 	
@@ -166,11 +195,20 @@ public class PagedGrid {
 	
 	@AfterRender
     private void afterRender(MarkupWriter writer) {
+		if (pagedsource.getAvailableRows() != 0) {
+			if (tree) {
+				scriptSupport.addScript("observeExpansionZone();");
+			}
+			scriptSupport.addScript("initializeGrid('"+getClientId()+"',"+maxHeight+");");
+		}
+		if (hoverAnimation) {
+			scriptSupport.addScript("enableHovering(true);");
+		}
 		if (checkBoxes) {
-			scriptSupport.addScript("listenToCheckAllBox();");
+			scriptSupport.addScript(InitializationPriority.LATE,"listenToCheckAllBox('"+checkall.getClientId()+"');");
 			rowIdClass = pagedsource.getRowIdClass();
 		}
-    	scriptSupport.addScript("observeGrid();");
+		checkedAll = false;
     }
 
 	public int getRowIndex() {
@@ -187,24 +225,27 @@ public class PagedGrid {
 
 	public String getOrdering() {
 		if (reorder != null) {
-			return "row" +addCheckBoxRow() + ","+ reorder;
+			return addExtraRows() + ","+ reorder;
 		} 
-		return "row" +addCheckBoxRow();
+		return addExtraRows();
 	}
 	
 	public String getAddedRow() {
 		if (add != null) {
-			return "row" +addCheckBoxRow() + ","+ add;
+			return addExtraRows() + ","+ add;
 		}
-		return "row" +addCheckBoxRow();
+		return addExtraRows();
 	}
 	
-	public String addCheckBoxRow() {
+	private String addExtraRows() {
+		String extraRows = "row";
 		if (checkBoxes) {
-			return ",checkbox";
-		} else {
-			return "";
+			extraRows = extraRows + ",checkbox";
 		}
+		if (tree) {
+			extraRows = extraRows + ",expander";
+		}
+		return extraRows; // hmm ok, this works
 	}
 	
 	public int getSelectedRowsPerPage() {
@@ -220,65 +261,47 @@ public class PagedGrid {
 		grid.setCurrentPage(1); // reset to page1
 	}	
 	
+	@OnEvent(value="fetchChildren")
+	Block fetchChildren(long rowId) {
+		children = pagedsource.fetchChildren(rowId);
+		return expansionZone.getBody();
+	}
+			
 	public PropertyOverrides getCustomOverrides() {
 		return new PagedGridOverrides();
 	}
 	
-	public class PagedGridOverrides implements PropertyOverrides {
-
-		public Block getOverrideBlock(String name) {
-			if ("rowCell".equals(name)){
-				return rowCell;
-			}
-			if (checkBoxes) {
-				if ("checkboxCell".equals(name)) {
-					return checkboxCell;
-				}
-				if ("checkboxHeader".equals(name)) {
-					return checkboxHeader;
-				}
-			}
-			return resources.getBlockParameter(name);
-		}
-
-		public Messages getOverrideMessages() {
-			return resources.getContainerMessages();
-		}
+	public PropertyOverrides getChildOverrides() {
+		return new ChildGridOverrides();
 	}
 	
-
-	
 	@OnEvent(value = "checkboxclicked")
-	private void clickme(String context) {
-		
-		if ("true".equalsIgnoreCase(context) ||"false".equalsIgnoreCase(context)) {
-			if (Boolean.parseBoolean(context)) {
+	private void clickme(EventContext context) {
+		if (!(rowIdClass == null || checkedItems == null)) {
+			if (context.toStrings().length ==1) {
+				checkedAll = !checkedAll;
 				for (Object key: checkedItems.keySet()) {
-					checkedItems.put(key, true);
+					checkedItems.put(key, checkedAll);
 				}
 			} else {
-				for (Object key: checkedItems.keySet()) {
-					checkedItems.put(key, false);
+				// rowObject is the actual(real) type and value of the selected item
+				final Object rowObject = context.get(rowIdClass, 0);
+				/*
+				 * containsKey works with equal and equal does NOT work with Long, which is usually the class
+				 * of a primary hibernate key!
+				 */
+				boolean found = false;
+				for (Object key:checkedItems.keySet()) {
+					if ((""+key).equals(""+rowObject)) {
+						found = true;
+						break;
+					}
 				}
-			}
-		} else {
-			// rowObject is the actual(real) type and value of the selected item
-			final Object rowObject = coerer.coerce(context, rowIdClass);
-			/*
-			 * containsKey works with equal and equal does NOT work with Long, which is usually the class
-			 * of a primary hibernate key!
-			 */
-			boolean found = false;
-			for (Object key:checkedItems.keySet()) {
-				if ((""+key).equals(""+rowObject)) {
-					found = true;
-					break;
+				if (found) {
+					checkedItems.put(rowObject, !checkedItems.get(rowObject));
+				} else {
+					throw new TapestryException("Could not add selected row , because it is not in the grid.",this,null);
 				}
-			}
-			if (found) {
-				checkedItems.put(rowObject, !checkedItems.get(rowObject));
-			} else {
-				throw new TapestryException("Could not add selected row , because it is not in the grid.",this,null);
 			}
 		}
 	}
@@ -341,5 +364,46 @@ public class PagedGrid {
 		grid.reset();
 		checkedItems = null;
 	}
+	
+	public BeanModel<?> getChildModel() {
+		return grid.getDataModel();
+	}
+	
+	/*
+	 * Overrides for parent and child grid
+	 */
+	private class PagedGridOverrides implements PropertyOverrides {
+
+		public Block getOverrideBlock(String name) {
+			try {
+				return resources.getBlock(name);
+			} catch (Exception e) {
+				return resources.getBlockParameter(name);
+			}
+		}
+
+		public Messages getOverrideMessages() {
+			return resources.getContainerMessages();
+		}
+	}
+	
+	private class ChildGridOverrides implements PropertyOverrides {
+
+		public Block getOverrideBlock(String name) {
+			if (name.endsWith("Header")) {
+				return null; // child grid does not have headers.
+			}
+			try {
+				return resources.getBlock(name+"Child");
+			} catch (Exception e) {
+				return resources.getBlockParameter(name+"Child");
+			}
+		}
+
+		public Messages getOverrideMessages() {
+			return resources.getContainerMessages();
+		}
+	}
+
 	
 }

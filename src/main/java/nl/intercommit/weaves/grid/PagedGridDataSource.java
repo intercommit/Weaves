@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.grid.GridDataSource;
 import org.apache.tapestry5.grid.SortConstraint;
+import org.apache.tapestry5.ioc.internal.util.TapestryException;
 
 /**
  * Paged implementation of a GridDataSource,
@@ -33,6 +34,8 @@ import org.apache.tapestry5.grid.SortConstraint;
  */
 public abstract class PagedGridDataSource implements GridDataSource {
 
+	protected ChildrenFetcher fetcher;
+	
 	@Persist
 	private int startIndex;
 	
@@ -72,6 +75,13 @@ public abstract class PagedGridDataSource implements GridDataSource {
 	
 	public abstract List<?> fetchResult(int startIndex,int endIndexPlusOne,List<SortConstraint> sortConstraints);
 	
+	public List<?> fetchChildren(final long rowId) {
+		if (fetcher != null) {
+			return fetcher.fetchChildren(rowId);
+		}
+		throw new TapestryException("Could not fetch children for 'PagedGridDataSource', no fetcher specified!",this,null);
+	}
+
 	/**
 	 * Should return a value identifying the current checked row
 	 * 
@@ -83,6 +93,6 @@ public abstract class PagedGridDataSource implements GridDataSource {
 	 */
 	public abstract Object getIdentifierForRowValue(final Object rowObject);
 	
-	public abstract Class getRowIdClass();
+	public abstract Class<?> getRowIdClass();
 	
 }

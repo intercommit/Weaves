@@ -1,9 +1,9 @@
-<div xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" id="pagedgrid">
+<div class="weaves-pagedgrid" xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd">
+	<div t:id="grid" id="${clientid}"/>
 	
-	<div t:id="grid"/>
 	<div id="noGridBottom"/>
 	<t:if test="pagedSource.availablerows" negate="true">
-		<div class="ic_t5-pagedgrid-noresults">${message:pagedgrid-no-result}</div>
+		<div class="weaves-pagedgrid-noresults">${message:pagedgrid-no-result}</div>
 	</t:if>
 	
 	<t:block id="rowCell">
@@ -11,15 +11,49 @@
 	</t:block>
 	
 	<t:block id="checkboxCell">
-		<t:form><t:ck.AjaxCheckbox t:id="checkBox" value="checked" context="RowIdentifier"/></t:form> 
+		<t:form><t:ck.AjaxCheckbox t:id="checkBox" value="literal:false" context="RowIdentifier" class="weaves-checkbox"/></t:form> 
 	</t:block>
 	
 	<t:block id="checkboxHeader">
-		<t:form><t:ck.AjaxCheckbox value="checkall" t:id="checkall"/></t:form> 
+		<t:form><t:ck.AjaxCheckbox value="literal:false" t:id="checkall"/></t:form> 
 	</t:block>
 
   	<t:block>
 		<div t:id="pagedpager"/>
 	</t:block>
 	
+	<t:block id="expanderHeader">
+		+
+	</t:block>
+	
+	<t:block id="expanderCell">
+		<div class="expander">
+			<t:eventlink t:id="fetchChildren" zone="expansionZone" context="${rowIdentifier}"><img src="${expandImage}"/></t:eventlink> 
+		 </div>
+		 <div class="contracter weaves-pagedgrid-hidden">
+		 	<a href="#">
+		 		<t:any t:id="closeChild" t:mixins="weaves/CallBack" t:callback="closeChildren"><img src="${collapseImage}"/></t:any>
+		 	</a>
+		</div>
+	</t:block>
+	
+	<t:zone t:id="expansionZone" id="expansionZone" style="display: none;" show="none" update="none">
+		<t:if test="children">
+			<t:grid t:id="childrenGrid" id="childrenGrid" clientId="childrenGrid" source="children" model="childmodel" rowclass="literal:child" overrides="childOverrides" row="grid.row" pagerPosition="NONE" rowsPerPage="999">
+				<t:parameter name="checkboxHeader">
+					<div style="visibility: hidden;">
+					<form>
+						<input type="checkbox" class="input"/>
+					</form>
+					</div>
+				</t:parameter>
+			</t:grid>
+		</t:if>
+	</t:zone>
+	
+	<t:zone t:id="somezone" id="somezone"/>
+	
+	<t:block t:id="expanderCellChild">
+		<img src="${branchImage}"/>
+	</t:block>
 </div>

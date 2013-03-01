@@ -37,9 +37,10 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * ModalBox support for Tapestry5 Check <a
  * href='http://okonet.ru/projects/modalbox/index.html'>ModalBox</a> for details
  * This component uses version 1.5.5
+ * <p/>
+ * copied from : http://tapestry.1045711.n5.nabble.com/Modalbox-Integration-Example-td4248936.html#a4257039
  * 
- * @notes copied from : http://tapestry.1045711.n5.nabble.com/Modalbox-Integration-Example-td4248936.html#a4257039
- * 
+ * @tapestrydoc
  */
 @Import(library = { "modal/builder.js","modal/modalbox.js", "modal/modalboxinit.js" }, stylesheet = "modal/modalbox.css")
 @SupportsInformalParameters

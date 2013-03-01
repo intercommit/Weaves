@@ -1,4 +1,3 @@
 <div xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" class="textmarker">
-	
 	<t:loop source="matches" value="match">${match.prefix}<t:if test="match.word"><div class="highlight">${match.word}</div></t:if></t:loop>
 </div>

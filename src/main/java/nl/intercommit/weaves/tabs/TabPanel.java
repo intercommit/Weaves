@@ -16,18 +16,44 @@
 *  along with Weaves.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
-package nl.intercommit.weaves.test.pages;
+package nl.intercommit.weaves.tabs;
 
-import nl.intercommit.weaves.components.HoverLink;
-import nl.intercommit.weaves.util.HoverlinkStreamResponse;
+public class TabPanel {
 
-import org.apache.tapestry5.StreamResponse;
-import org.apache.tapestry5.annotations.OnEvent;
-
-public class HoverLinkPage {
-
-	@OnEvent(component="hoverlink",value=HoverLink.RETRIEVE_CONTENT_EVENT)
-	private StreamResponse returnContent1() {
-		return new HoverlinkStreamResponse("Popup Title","Popup test content");
+	private String id;
+	private String title;
+	private String blockid;
+	
+	public TabPanel(String id,String title) {
+		this.id = id;
+		this.title = title;
+		this.blockid=id;
 	}
+	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getBlockid() {
+		return blockid;
+	}
+	/**
+	 * Override the to render blockid for this id
+	 * 
+	 * @param blockid
+	 */
+	public void setBlockid(String blockid) {
+		this.blockid = blockid;
+	}
+	
+	
+	
 }

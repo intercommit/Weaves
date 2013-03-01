@@ -16,24 +16,39 @@
 *  along with Weaves.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
-package nl.intercommit.weaves;
+package nl.intercommit.weaves.growler;
 
-import util.WeaveTestCase;
+public class Message {
 
-public class TestHoverlink extends WeaveTestCase {
-
+	public enum LEVEL {
+		INFO,
+		WARN,
+		ERROR;
+	}
 	
+	private final LEVEL _level;
+	private final String _msg;
 	
-	public void testHoverLinkComponent() {
-		org.apache.tapestry5.dom.Document dom = getTester().renderPage("HoverlinkPage");
-		
-		assertNotNull(dom);
-		assertNotNull(dom.getElementById("hoverlink"));
-		
-		assertTrue(dom.getElementById("hoverlink").toString().equals("<a onclick=\"return false;\" class=\"ic_t5-hoverlink\" id=\"hoverlink\" href=\"#\">consectetur</a>"));
-		assertTrue(dom.toString().contains("\"dataURL\":\"http://localhost/foo/hoverlinkpage.hoverlink:retrievecontent\""));
-		
+	/**
+	 * Default is {@link LEVEL.INFO} level 
+	 * 
+	 */
+	public Message(final String message) {
+		this._level = LEVEL.INFO;
+		this._msg = message;
 	}
 	
 	
+	public Message(final LEVEL level,final String message) {
+		this._level = level;
+		this._msg = message;
+	}
+	
+	public String getMessage() {
+		return _msg;
+	}
+	
+	public LEVEL getLevel() {
+		return _level;
+	}
 }

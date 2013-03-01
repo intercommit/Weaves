@@ -21,23 +21,26 @@ package nl.intercommit.weaves.components;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import nl.intercommit.weaves.menu.MenuItem;
 
+import org.apache.tapestry5.ComponentResources;
+import org.apache.tapestry5.annotations.BeginRender;
 import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
+/**
+ * @tapestrydoc
+ */
 @Import(library="DropDownMenu.js",stylesheet="DropDownMenu.css")
 public class DropDownMenu {
 
-	public final static String MENU_ITEM_SELECTED = "selectmenuitem";
-	
 	// linkedhashmaps to preserve ordering!
 	@Parameter(required=true,allowNull=false)
 	private LinkedHashMap<MenuItem,LinkedHashMap<MenuItem, List<MenuItem>>> menu;
@@ -46,7 +49,7 @@ public class DropDownMenu {
 	private JavaScriptSupport js;
 	
 	@Inject
-	private Request request;
+	private ComponentResources cr;
 	
 	@Property
 	private MenuItem level1;
@@ -57,8 +60,8 @@ public class DropDownMenu {
 	@Property
 	private MenuItem level3;
 	
-	private boolean matched = false;
-	
+	private MenuItem selectedLevel;
+
 	@SetupRender
 	private void initJavaScript() {
 		js.addScript("initMenu();", "");
@@ -106,44 +109,49 @@ public class DropDownMenu {
 		return false;
 	}
 	
-	public String getSelectedClass() {
-		String className= "none";
-		for (MenuItem topLevel: menu.keySet()) {
-			if (matchesRequest(topLevel,topLevel)) {
-				return "toplevelselected";
+	@BeginRender
+	public void determineSelectedLevel() {
+		if (menu.keySet().size() > 0) {
+			String reqPath = cr.getPage().getComponentResources().getPageName();
+			if (reqPath.endsWith("/Index")) {
+				// special case, default page reached (dont know where this is configured..) so it could break.
+				reqPath = reqPath.substring(0,reqPath.indexOf("/Index"));
 			}
-			if (menu.get(topLevel) != null) {
-				for (MenuItem level2: menu.get(topLevel).keySet()) {
-					if (matchesRequest(level2,topLevel)) {
-						return "toplevelselected";
+			
+			selectedLevel = (MenuItem) menu.keySet().toArray()[0]; // select 1st menu
+			
+			for (MenuItem rootLevel:menu.keySet()) {
+				List<MenuItem> allItems = new LinkedList<MenuItem>();	
+				
+				allItems.add(rootLevel); // me
+				if (menu.get(rootLevel) != null) {
+					allItems.addAll(menu.get(rootLevel).keySet()); // all level2's
+					for (MenuItem level3: menu.get(rootLevel).keySet()) {
+						final List<MenuItem> subs = menu.get(rootLevel).get(level3);
+						if (subs != null) {
+							allItems.addAll(subs);	
+						}
 					}
-					if (menu.get(topLevel).get(level2) !=null ) {
-					
-						for (Object level3: menu.get(topLevel).get(level2).toArray()) {
-							if (matchesRequest((MenuItem)level3,topLevel)) {
-								return "toplevelselected";
-							}
+				}
+				
+				for (MenuItem item: allItems) {
+					final String basePath = item.getUrl().getBasePath().substring(1);
+					if (basePath.length() > 0) {
+						if (basePath.contains(reqPath.toLowerCase())) {
+							selectedLevel = rootLevel;
+							break;
 						}
 					}
 				}
 			}
 		}
-		return className;
 	}
-
-	private boolean matchesRequest(final MenuItem menu,final MenuItem currentLevel) {
-		if (matched) {
-			return false;
+	
+	public String getSelectedclass() {
+		if (level1.equals(selectedLevel)) {
+			return "toplevelselected";
 		}
-		String basePath = menu.getUrl().getBasePath();
-		String reqPath = request.getPath();
-		if (!request.getContextPath().equals("")) {
-			basePath = basePath.substring(request.getContextPath().length());
-		}
-		matched = (basePath.startsWith(reqPath) &&
-					currentLevel == level1 &&
-					reqPath.length() > 1) ;
-		return matched;
+		return "none";
 	}
 	
 }

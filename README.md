@@ -1,7 +1,7 @@
 Weaves
 ======
 
-A Tapestry 5.2 component module featuring new components and multiple database support.
+A Tapestry 5.3.x component module featuring new components and adds support for multiple hibernate sessions.
 
 #### Provided components in this library: ####
 
@@ -10,15 +10,19 @@ A Tapestry 5.2 component module featuring new components and multiple database s
 - Switch
 - TextMarker
 - ModalBox
-- Hoverlink
+- Datatable
 - EditableSelectBox
 - DropDownMenu
+- Growler
+- Tabs
 
 #### Provided Mixins in this library: ####
 
  * Confirm
-	A javascript popup dialog to be used for confirming actions on urls
+	A javascript popup dialog to be used for confirming actions on hyperlinks.
 
+ * OpenTip
+    A tooltip based on opentip.org
 
 #### Provided Services in this library: ####
 
@@ -26,9 +30,9 @@ A Tapestry 5.2 component module featuring new components and multiple database s
 	A multi session / multi database service
 
 	
-### TODO ###
+### Binaries ###
 
-There are still some TODO's left in the code, but 95% is working fine.
+For those who cannot build the jar themselves, there is a binaries directory in which compiled and packaged jar files are available.
 
 ### Building ###
 
@@ -41,8 +45,3 @@ Currently at around 70% coverage. Still some work to do to increase coverage.
 ### DEMO ###
 
 A working demo can be found at: http://intercommitweavesdemo.intercommit.cloudbees.net/
-There are 3 parts still not (correctly) working at the demo site: 
-
- * TextMarker demo - Crashes with a internal Tapestry exception
- * ModalBox demo - Crashes with a internal Tapestry exception
- * Hibernate demo - Seems to ignore the Layout component
