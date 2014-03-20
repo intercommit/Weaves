@@ -21,19 +21,17 @@ function showWindow(event) {
 		popupWindow.options.effectOptions= { duration: 0.0 };
 		popupWindow.oldStyle = 'auto'; // this is a (possible) fix for some weird bug in chenillikit where it takes the overflow style of the previous windows.. which is kinda dumb..
 		popupWindow.showCenter(true);
+	}
+	if (popupWindow.options.autoResize) {
+		// resize height only
+		// get the zone div
+		var contentHeight = popupWindow.getContent().childElements()[0].offsetHeight + popupWindow.heightN + popupWindow.heightS;
 		
-		
-		if (popupWindow.options.autoResize) {
-			// resize height only
-			// get the zone div
-			var contentHeight = popupWindow.getContent().childElements()[0].offsetHeight + popupWindow.heightN + popupWindow.heightS;
+		if (contentHeight < popupWindow.options.maxHeight &&
+				contentHeight != popupWindow.height &&
+				popupWindow.getContent().offsetHeight < contentHeight) {
 			
-			if (contentHeight < popupWindow.options.maxHeight &&
-					contentHeight != popupWindow.height &&
-					popupWindow.getContent().offsetHeight < contentHeight) {
-				
-				popupWindow.setSize(popupWindow.width,contentHeight,true);	
-			}
+			popupWindow.setSize(popupWindow.width,contentHeight,true);	
 		}
 	}
 }

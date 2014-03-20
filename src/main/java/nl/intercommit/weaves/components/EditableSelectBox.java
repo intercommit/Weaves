@@ -1,4 +1,4 @@
-/*  Copyright 2011 InterCommIT b.v.
+/*  Copyright 2014 InterCommIT b.v.
 *
 *  This file is part of the "Weaves" project hosted on https://github.com/intercommit/Weaves
 *
@@ -20,6 +20,7 @@ package nl.intercommit.weaves.components;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.tapestry5.Binding;
 import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.ComponentResources;
@@ -39,6 +40,7 @@ import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.Mixin;
 import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.annotations.RequestParameter;
+import org.apache.tapestry5.annotations.SupportsInformalParameters;
 import org.apache.tapestry5.corelib.base.AbstractField;
 import org.apache.tapestry5.corelib.mixins.RenderDisabled;
 import org.apache.tapestry5.internal.util.CaptureResultCallback;
@@ -56,6 +58,7 @@ import org.apache.tapestry5.util.EnumSelectModel;
 /**
  * @tapestrydoc
  */
+@SupportsInformalParameters
 @Import(library="editableselect/EditableSelect.js",stylesheet="editableselect/EditableSelect.css")
 public class EditableSelectBox extends AbstractField {
 	
@@ -79,6 +82,10 @@ public class EditableSelectBox extends AbstractField {
      */
     @Parameter(required = true, allowNull = false)
     private List<String> items;
+    
+    // additional class name(s)
+    @Parameter(required = false, defaultPrefix=BindingConstants.LITERAL)
+    private String className;
 
     @Inject
     private Request request;
@@ -167,7 +174,12 @@ public class EditableSelectBox extends AbstractField {
         if (selectedClientValue == null)
             selectedClientValue = value == null ? null : encoder.toClient(value);
         
-        writer.element("input","name",getControlName(),"id",getClientId(),"type","text","class","select-input","autocomplete","off","value",selectedClientValue);
+        String computedClassName =  "select-input";
+        if (StringUtils.isNotBlank(className)) {
+        	computedClassName = computedClassName + " " + className;
+        }
+        
+        writer.element("input","name",getControlName(),"id",getClientId(),"type","text","class",computedClassName,"autocomplete","off","value",selectedClientValue);
 
         putPropertyNameIntoBeanValidationContext("value");
 

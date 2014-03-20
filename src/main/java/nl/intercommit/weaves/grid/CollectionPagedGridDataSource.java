@@ -1,4 +1,4 @@
-/*  Copyright 2011 InterCommIT b.v.
+/*  Copyright 2014 InterCommIT b.v.
 *
 *  This file is part of the "Weaves" project hosted on https://github.com/intercommit/Weaves
 *
@@ -33,15 +33,15 @@ import org.apache.tapestry5.grid.ColumnSort;
 import org.apache.tapestry5.grid.SortConstraint;
 import org.apache.tapestry5.ioc.internal.util.CollectionFactory;
 
-public class CollectionPagedGridDataSource extends PagedGridDataSource {
+public class CollectionPagedGridDataSource<T> extends PagedGridDataSource<T> {
 
 	// a filtered subset of the collection
-	private final List<?> list;
+	private final List<T> list;
 	
 	// an Map with hashed object keys for fast searching.
 	private final Map<Integer,Integer> indexedList;
 
-    public CollectionPagedGridDataSource(final Collection<?> collection,final Class<?> entityType) {
+    public CollectionPagedGridDataSource(final Collection<T> collection,final Class<T> entityType) {
     	super(entityType);
     	
     	assert collection != null;
@@ -55,7 +55,7 @@ public class CollectionPagedGridDataSource extends PagedGridDataSource {
     	}
     }
     
-    public List<?> fetchResult(int startIndex, int endIndexPlusOne,
+    public List<T> fetchResult(int startIndex, int endIndexPlusOne,
 		List<SortConstraint> sortConstraints) {
     	
     	// apply a filter first

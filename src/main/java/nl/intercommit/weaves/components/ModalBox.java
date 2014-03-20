@@ -1,4 +1,4 @@
-/*  Copyright 2011 InterCommIT b.v.
+/*  Copyright 2014 InterCommIT b.v.
 *
 *  This file is part of the "Weaves" project hosted on https://github.com/intercommit/Weaves
 *
@@ -42,7 +42,7 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * 
  * @tapestrydoc
  */
-@Import(library = { "modal/builder.js","modal/modalbox.js", "modal/modalboxinit.js" }, stylesheet = "modal/modalbox.css")
+@Import(library = { "classpath:${tapestry.scriptaculous.path}/builder.js","modal/modalbox.js", "modal/modalboxinit.js" }, stylesheet = "modal/modalbox.css")
 @SupportsInformalParameters
 public class ModalBox implements ClientElement {
 

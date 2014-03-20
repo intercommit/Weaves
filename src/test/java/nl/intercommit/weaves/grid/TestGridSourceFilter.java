@@ -70,8 +70,8 @@ public class TestGridSourceFilter extends TestCase {
 		HibernatePagedGridDataSource hpds = new HibernatePagedGridDataSource(session,Person.class) {
 			
 			@Override
-			public void applyFiltering(Criteria criteria) {
-				criteria.add(Restrictions.eq("name", "fred"));
+			public void applyFiltering() {
+				getCriteria().add(Restrictions.eq("name", "fred"));
 			}
 		};
 		

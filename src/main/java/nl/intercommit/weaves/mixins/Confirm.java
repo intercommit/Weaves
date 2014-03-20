@@ -1,4 +1,4 @@
-/*  Copyright 2011 InterCommIT b.v.
+/*  Copyright 2014 InterCommIT b.v.
 *
 *  This file is part of the "Weaves" project hosted on https://github.com/intercommit/Weaves
 *
@@ -33,6 +33,8 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * event of any component that implements ClientElement.
  *
  * @author <a href="mailto:chris@thegodcode.net">Chris Lewis</a> Apr 18, 2008
+ * 
+ * @tapestrydoc
  */
 @Import(library={"Confirm.js"})
 public class Confirm {

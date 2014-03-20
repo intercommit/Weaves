@@ -1,4 +1,4 @@
-/*  Copyright 2011 InterCommIT b.v.
+/*  Copyright 2014 InterCommIT b.v.
 *
 *  This file is part of the "Weaves" project hosted on https://github.com/intercommit/Weaves
 *
@@ -14,6 +14,7 @@
 *
 *  You should have received a copy of the GNU Lesser General Public License
 *  along with Weaves.  If not, see <http://www.gnu.org/licenses/>.
+*
 */
 package nl.intercommit.weaves.base;
 
@@ -23,6 +24,10 @@ import org.apache.tapestry5.annotations.Environmental;
 import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
+/**
+ * @tapestrydoc
+ *
+ */
 public abstract class BasicClientElement implements ClientElement {
 	
 	private String assignedClientId;

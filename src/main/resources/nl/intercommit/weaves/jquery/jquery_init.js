@@ -1,1 +1,0 @@
-var $T5_JQUERY=jQuery.noConflict(); // make jquery publicly available under this alias

@@ -1,4 +1,4 @@
-/*  Copyright 2011 InterCommIT b.v.
+/*  Copyright 2014 InterCommIT b.v.
 *
 *  This file is part of the "Weaves" project hosted on https://github.com/intercommit/Weaves
 *
@@ -23,12 +23,13 @@ import java.util.List;
 
 import nl.intercommit.weaves.base.BasicClientElement;
 
+import org.apache.tapestry5.annotations.BeginRender;
 import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.annotations.Property;
-import org.apache.tapestry5.annotations.SetupRender;
 /**
  * Marks specific keywords in a text with a yellow background.
+ * 
  * @tapestrydoc
  */
 @Import(stylesheet="TextMarker.css")
@@ -54,7 +55,7 @@ public class TextMarker extends BasicClientElement {
 	@Property
 	private Match match;
 	
-	@SetupRender
+	@BeginRender
 	public void makeMatches() {
 		
 		final String[] lowerCaseKeywords= new String[keywords.length]; 
@@ -105,19 +106,22 @@ public class TextMarker extends BasicClientElement {
 		
 		match = new Match(0,null);
 		
-		int remainder = 0;
-		if (maxLength > 0 ) {
-			remainder = maxLength - currentLength;
-			if (remainder <0) remainder= 0;
+		if (!matches.isEmpty()) {
+			int remainder = 0;
+			if (maxLength > 0 ) {
+				remainder = maxLength - currentLength;
+				if (remainder <0) remainder= 0;
+			} else {
+				remainder = workingMessage.length();
+			}
+			if (remainder > paddingSize) {
+				match.prefix = workingMessage.substring(0, paddingSize) + POINTS;
+			} else {
+				match.prefix = workingMessage.substring(0,remainder);
+			}	
 		} else {
-			remainder = workingMessage.length();
+			match.prefix = workingMessage;
 		}
-		if (remainder > paddingSize) {
-			match.prefix = workingMessage.substring(0, paddingSize) + POINTS;
-		} else {
-			match.prefix = workingMessage.substring(0,remainder);
-		}
-		
 		matches.add(match);
 	}
 	
@@ -174,4 +178,3 @@ public class TextMarker extends BasicClientElement {
 	}
 	
 }
-

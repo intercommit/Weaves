@@ -1,4 +1,4 @@
-/*  Copyright 2011 InterCommIT b.v.
+/*  Copyright 2014 InterCommIT b.v.
 *
 *  This file is part of the "Weaves" project hosted on https://github.com/intercommit/Weaves
 *
@@ -37,6 +37,7 @@ import org.apache.tapestry5.grid.GridDataSource;
 import org.apache.tapestry5.internal.beaneditor.BeanModelUtils;
 import org.apache.tapestry5.ioc.Messages;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.json.JSONArray;
 import org.apache.tapestry5.json.JSONObject;
 import org.apache.tapestry5.services.BeanModelSource;
@@ -49,7 +50,7 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * 
  * @tapestrydoc
  */
-@Import(library={"datatable/datatable.js","datatable/dataTables.min.js"},stylesheet="datatable/datatable.css",stack="jquery")
+@Import(library={"datatable/datatable.js","../jquery/dataTables.min.js"},stylesheet="datatable/datatable.css",stack="jquery")
 @SupportsInformalParameters
 public class DataTable extends nl.intercommit.weaves.base.BasicClientElement {
 	
@@ -99,7 +100,8 @@ public class DataTable extends nl.intercommit.weaves.base.BasicClientElement {
 	private Messages msgs;
 	
 	@Property
-	private BeanModel<Object> model;
+	@Parameter(allowNull=true)
+	private BeanModel<?> model;
 	
 	private String header;
 	
@@ -109,9 +111,24 @@ public class DataTable extends nl.intercommit.weaves.base.BasicClientElement {
 	@Inject
 	private Block empty;
 	
+	@Inject
+	@Symbol(nl.intercommit.weaves.SymbolConstants.BOOTSTRAP_ENABLED)
+	private boolean bootstrap;
+	
 	private boolean renderBody;
 	
 	Object setupRender() {
+		if (model == null) {
+			final Class<?> rowType = source.getRowType();
+
+            if (rowType == null)
+                throw new RuntimeException(
+                        String.format(
+                                "Unable to determine the bean type for rows from %s. You should bind the model parameter explicitly.",
+                                source));
+			
+			model = bms.createDisplayModel(rowType,msgs);
+		}
 		return source.getAvailableRows() == 0 ? empty : null;
     }
 	
@@ -121,7 +138,6 @@ public class DataTable extends nl.intercommit.weaves.base.BasicClientElement {
 		if (source.getAvailableRows() == 0) return renderBody;
 		
 		renderBody = true;
-		model = bms.createDisplayModel(source.getRowType(),msgs);
 		
 		BeanModelUtils.modify(model, add, include, exclude, reorder);
 		
@@ -184,5 +200,13 @@ public class DataTable extends nl.intercommit.weaves.base.BasicClientElement {
 	
 	public void setHeader(String header) {
 		this.header = header;
+	}
+	
+	public String getTableClass() {
+		if (bootstrap) {
+			return "table";
+		} else {
+			return "display";
+		}
 	}
 }

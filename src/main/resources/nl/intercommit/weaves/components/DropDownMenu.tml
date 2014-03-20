@@ -1,13 +1,17 @@
-<div class="ic_t5-menu" xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd">
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd" xmlns:p="tapestry:parameter">
+	<t:delegate to="menublock"/>
+	
+	<t:block id="classic">
+		<div class="weaves-menu">
 			<t:if test="haslevel1">
 				<ul class="level1" id="root">
 					<t:loop source="menubar" value="level1">
 						<li id="${selectedclass}">
 							<t:if test="level1.image">
 								<a href="${level1.url}"><div style="display:inline; margin-right: 5px;"><img src="${level1.image}"></img></div>${level1.name}</a>
-								<t:parameter name="else">
+								<p:else>
 									<a href="${level1.url}">${level1.name}</a>
-								</t:parameter>
+								</p:else>
 							</t:if>
 							<t:if test="haslevel2">
 								<ul class="level2">
@@ -16,9 +20,9 @@
 											<t:if test="haslevel3">
 												<a href="${level2.url}">${level2.name}<div class="morelevels"> > </div></a>
 												
-												<t:parameter name="else">
+												<p:else>
 													<a href="${level2.url}">${level2.name}</a>
-												</t:parameter>	
+												</p:else>
 											</t:if>
 											<t:if test="haslevel3">
 												<ul class="level3">
@@ -35,4 +39,61 @@
 					</t:loop>
 				</ul>
 			</t:if>
-</div>
+		</div>
+	</t:block>
+	
+	<t:block id="bootstrap">
+		<ul class="nav navbar-nav">
+			<t:if test="haslevel1">
+				<t:loop source="menubar" value="level1">
+						<t:if test="haslevel2">
+							<li class="dropdown">
+							<a data-toggle="dropdown" class="dropdown-toggle" href="#">
+								<t:if test="level1.image">
+									<div style="display:inline; margin-right: 5px;"><img src="${level1.image}"></img></div>${level1.name}
+									<p:else>
+										${level1.name}
+									</p:else>
+								</t:if>
+								<b class="caret"></b>
+							</a>
+              					<ul class="dropdown-menu">
+              						<t:loop source="menuitems" value="level2">
+              							<t:if test="haslevel3">
+              								 <li class="dropdown-submenu">
+                  								<a href="#">${level2.name}</a>
+                  								<ul class="dropdown-menu">
+                  									<t:loop source="submenus" value="level3">
+														<li><a href="${level3.url}">${level3.name}</a></li>
+													</t:loop>
+              									</ul>
+              								</li>
+              								
+              								<p:else>
+												<li><a href="${level2.url}">${level2.name}</a></li>
+											</p:else>	
+              							</t:if>
+										
+									</t:loop>
+              					</ul>
+              				</li>
+              				<p:else>
+              					<li>
+              					<t:if test="level1.image">
+									<a href="${level1.url}"><div style="display:inline; margin-right: 5px;"><img src="${level1.image}"></img></div>${level1.name}</a>
+									<p:else>
+										<a href="${level1.url}">${level1.name}</a>
+									</p:else>
+								</t:if>
+								</li>
+              				</p:else>
+						</t:if>
+				</t:loop>
+			</t:if>
+       </ul>
+	</t:block>
+	
+
+</html>
+
+

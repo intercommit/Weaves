@@ -14,16 +14,11 @@ function listenToCheckAllBox(clientid) {
 function initializeGrid(clientid,maxHeight) {
 	
 	Event.observe($(clientid),'mouseover',highlightrow);
-	
-	var $jQ = jQuery.noConflict();
-	
-	var grid = $jQ("#"+clientid);
+	var grid = $T5_JQUERY("#"+clientid);
 	if (grid.height()>maxHeight) {
-		grid.chromatable({
-			width: grid.width(),
-			height: maxHeight,
-			scrolling: "yes"
-        	});
+		grid.fixedHeaderTable({height: maxHeight, footer: false, cloneHeadToFoot: false, fixedColumn: false });
+		grid.fixedHeaderTable('show');
+		grid.parents(".weaves-pagedgrid").css("width", grid.width()+20);// correction for the horizontal scrolling bar..
 	}
 }
 
@@ -32,8 +27,8 @@ function enableHovering(enabled) {
 }
 
 
-function observeExpansionZone() {
-	Event.observe($('expansionZone'),Tapestry.ZONE_UPDATED_EVENT,showChildren);
+function observeExpansionZone(clientid) {
+	Event.observe($(clientid),Tapestry.TRIGGER_ZONE_UPDATE_EVENT,displaySpinner);
 }
 
 function selectAllCheckBoxes(event) {
@@ -82,33 +77,19 @@ function highlightRowElement(element) {
 		
 			if (element.rowIndex > 0) {
 				if (prevSelectedRow != null) {
-					if (hoverAnimation) prevSelectedRow.removeClassName('weaves-rowSelect');
+					if (hoverAnimation) prevSelectedRow.removeClassName('rowSelect');
 				}
 				prevSelectedRow = element;
-				if (hoverAnimation) element.addClassName('weaves-rowSelect')
+				if (hoverAnimation) element.addClassName('rowSelect')
 			}
 		}
-	}
-}
-
-function showChildren(event) {
-	
-	if ($('childrenGrid') != null) {
-		var rowArray = $('childrenGrid').select('tbody')[0].childElements();
-		var len=rowArray.length;
-		for(var i=len; i>=0; i--) {
-			var value = rowArray[i];
-			prevSelectedRow.insert({after: value});	
-		}
-		prevSelectedRow.select('div.expander')[0].addClassName('weaves-pagedgrid-hidden');
-		prevSelectedRow.select('div.contracter')[0].removeClassName('weaves-pagedgrid-hidden');
 	}
 }
 
 function closeChildren(event,context) {
 	
 	var childArray = new Array();
-	var row = prevSelectedRow.next('TR');
+	var row = $(context).next('TR');
 	var i = 0;
 	while (row != null && row.hasClassName('child')) {
 		childArray[i++] = row;
@@ -119,9 +100,35 @@ function closeChildren(event,context) {
 		item.remove();
 	});
 	
-	prevSelectedRow.select('div.expander')[0].removeClassName('weaves-pagedgrid-hidden');
-	prevSelectedRow.select('div.contracter')[0].addClassName('weaves-pagedgrid-hidden');
+	$(context).select('div.expander')[0].removeClassName('weaves-pagedgrid-hidden');
+	$(context).select('div.contracter')[0].addClassName('weaves-pagedgrid-hidden');
 }
+
+function displaySpinner(event) {
+	event.srcElement.innerHTML = event.srcElement.innerHTML.sub('expand.png','loader.gif');
+}
+
+function resetRow(id) {
+	var row = $(id);
+	var spinner = row.select('div.expander a')[0];
+	spinner.innerHTML = spinner.innerHTML.sub('loader.gif','expand.png');
+	if ($('childrenGrid') != null) {
+		var rowArray = $('childrenGrid').select('tbody')[0].childElements();
+		var len=rowArray.length;
+		for(var i=len; i>=0; i--) {
+			var value = rowArray[i];
+			row.insert({after: value});	
+		}
+		row.select('div.expander')[0].addClassName('weaves-pagedgrid-hidden');
+		row.select('div.contracter')[0].removeClassName('weaves-pagedgrid-hidden');
+	} else if ($('expansionZone').innerHTML) {
+		row.insert({after: '<tr class="child"><td colspan=999>' + $('expansionZone').innerHTML + '</td></tr>'});
+		row.select('div.expander')[0].addClassName('weaves-pagedgrid-hidden');
+		row.select('div.contracter')[0].removeClassName('weaves-pagedgrid-hidden');
+	}
+}
+
+
 /*
  * This is the changepage size implementation of the PagedPager
  */
@@ -136,7 +143,11 @@ function clickRow(response) {
 	prevClickedRow = prevSelectedRow;
 	prevClickedRow.addClassName('rowClicked');
 	
+	updateRibbon(response);
+}
+
+function updateRibbon(response) {
 	if(typeof afterRowClick == 'function') {
 		afterRowClick(response);
-	}
+	}	
 }

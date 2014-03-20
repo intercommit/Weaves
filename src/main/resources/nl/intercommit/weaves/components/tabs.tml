@@ -1,13 +1,35 @@
-<div class="weaves-tab" xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" >
-	<ul id="${clientid}">
-		<t:loop source="tabs" value="currenttab">
-			<li><a href="#${currenttab.id}"><span>${currenttab.title}</span></a></li>
-		</t:loop>
-	</ul>
+<div xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd" xmlns:p="tapestry:parameter">
 	
-	<t:loop source="tabs" value="currenttab">
-		<div id="${currenttab.id}" class="${panelclass}">
-			<t:delegate to="panelblock"></t:delegate>
+	<t:if test="bootstrap">
+	
+		<ul class="nav nav-tabs" id="${clientid}">
+			<t:loop source="tabs" value="currenttab">
+				<li><a href="#${currenttab.id}" data-toggle="tab">${currenttab.title}</a></li>
+			</t:loop>
+		</ul>
+		
+		<div class="tab-content">
+			<t:loop source="tabs" value="currenttab">
+				<div class="tab-pane" id="${currenttab.id}">
+					<t:delegate to="panelblock"></t:delegate>
+				</div>
+			</t:loop>
 		</div>
-	</t:loop>
+		
+		<p:else>
+			<div class="ic_t5-tab">
+				<ul id="${clientid}">
+					<t:loop source="tabs" value="currenttab">
+						<li><a href="#${currenttab.id}"><span>${currenttab.title}</span></a></li>
+					</t:loop>
+				</ul>
+				
+				<t:loop source="tabs" value="currenttab">
+					<div id="${currenttab.id}" class="${panelclass}">
+						<t:delegate to="panelblock"></t:delegate>
+					</div>
+				</t:loop>
+			</div>		
+		</p:else>
+	</t:if>
 </div>

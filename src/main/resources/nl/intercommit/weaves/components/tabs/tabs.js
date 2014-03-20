@@ -32,12 +32,13 @@ ProtoTabs.prototype = {
 			//get the tabs
 			tabLI = this.listElements[i];
 			var itemLinks = tabLI.getElementsByTagName('A');
-			tabLI.itemId = itemLinks[0].href.split("#")[1];
-			tabLI.linkedPanel = $(tabLI.itemId);
-			tabLI.linkedPanel.style.clear = "both";		//firefox hack
+			var id = itemLinks[0].href.split("#")[1];
+			
+			tabLI.linkedPanel = $(id);
+			tabLI.linkedPanel.style.clear = "both";		//make tabs appear below buttons
 
 			//check for the intially active tab
-			if((this.options.defaultPanel != '') && (this.options.defaultPanel == tabLI.itemId)){
+			if((this.options.defaultPanel != '') && (this.options.defaultPanel == id)){
 				this.openPanel(tabLI);
 			}else{
 				$($(tabLI).linkedPanel).hide();

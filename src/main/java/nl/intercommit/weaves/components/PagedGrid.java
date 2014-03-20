@@ -1,4 +1,4 @@
-/*  Copyright 2011 InterCommIT b.v.
+/*  Copyright 2014 InterCommIT b.v.
 *
 *  This file is part of the "Weaves" project hosted on https://github.com/intercommit/Weaves
 *
@@ -29,15 +29,17 @@ import nl.intercommit.weaves.grid.CollectionPagedGridDataSource;
 import nl.intercommit.weaves.grid.HibernatePagedGridDataSource;
 import nl.intercommit.weaves.grid.PagedGridDataSource;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.tapestry5.Asset2;
 import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.Block;
+import org.apache.tapestry5.ClientBodyElement;
+import org.apache.tapestry5.ComponentEventCallback;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.EventContext;
 import org.apache.tapestry5.MarkupWriter;
 import org.apache.tapestry5.PersistenceConstants;
 import org.apache.tapestry5.PropertyOverrides;
+import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Component;
 import org.apache.tapestry5.annotations.Import;
@@ -51,10 +53,15 @@ import org.apache.tapestry5.annotations.SupportsInformalParameters;
 import org.apache.tapestry5.beaneditor.BeanModel;
 import org.apache.tapestry5.corelib.components.Grid;
 import org.apache.tapestry5.corelib.components.Zone;
+import org.apache.tapestry5.grid.GridDataSource;
+import org.apache.tapestry5.internal.grid.CollectionGridDataSource;
 import org.apache.tapestry5.ioc.Messages;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.ioc.internal.util.TapestryException;
-import org.apache.tapestry5.ioc.services.TypeCoercer;
+import org.apache.tapestry5.services.AssetSource;
+import org.apache.tapestry5.services.ajax.AjaxResponseRenderer;
+import org.apache.tapestry5.services.ajax.JavaScriptCallback;
 import org.apache.tapestry5.services.javascript.InitializationPriority;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 import org.chenillekit.tapestry.core.components.AjaxCheckbox;
@@ -67,30 +74,24 @@ import org.chenillekit.tapestry.core.components.AjaxCheckbox;
  * 1. Each row gets highlighted when clicked on
  * 2. Does not query the database for all rows, only a subset with limit
  * 
- * Caution:
- * 
- * TODO: rename row
- * Your gridmodel cannot already have a row with name 'row'
- * 
- * TODO: be able to exclude the 'row'
- * 
- * Also when using checkboxes, make sure the rowidentifier function returns a unique index for the datasource, in case
+ * When using checkboxes, make sure the rowidentifier function returns a unique index for the datasource, in case
  * of hibernate this will be a primary key so not a problem. But in case of a Collection the source may have been altered in 
  * the meantime and thus give back the wrong rows.
  *
  *
  * @tapestrydoc
  */
-@Import(library={"pagedgrid/PagedGridScript.js","pagedgrid/jquery.chromatable.js"},stylesheet={"pagedgrid/PagedGrid.css"},stack="jquery")
+@Import(library={"pagedgrid/PagedGridScript.js"},stylesheet={"pagedgrid/PagedGrid.css","pagedgrid/fixedheadertable.css"},stack="jquery")
 @SupportsInformalParameters
-public class PagedGrid extends BasicClientElement {
+public class PagedGrid<T> extends BasicClientElement {
 	
+	public static final String FETCH_CHILDREN_EVENT = "getParentChilds";
 	
 	@Component
 	private nl.intercommit.weaves.components.Grid childrenGrid;
 	
 	@Parameter(required = true)
-    private PagedGridDataSource pagedsource;
+    private PagedGridDataSource<T> pagedsource;
 	
 	@Parameter(defaultPrefix = BindingConstants.LITERAL)
 	private String reorder;
@@ -119,6 +120,12 @@ public class PagedGrid extends BasicClientElement {
 	@Parameter(value="false",defaultPrefix=BindingConstants.LITERAL)
 	private boolean hoverAnimation;
 	
+	@Parameter(required=false,allowNull=true)
+	private BeanModel<T> childModel;
+	
+	@Parameter
+	private Integer rowsPerPage;
+	
 	@Component
 	private AjaxCheckbox checkall;
 	
@@ -132,12 +139,12 @@ public class PagedGrid extends BasicClientElement {
 	@Persist(PersistenceConstants.SESSION)
 	private Map<Object,Boolean> checkedItems;
 	
-	// the user can override the default rowsperpage, this will be persisted.
-	@Persist(PersistenceConstants.SESSION)
-	private int overriddenRowsPerPage;
-	
 	@Persist(PersistenceConstants.SESSION)
 	private boolean checkedAll;
+	
+	@Property
+	@Persist(PersistenceConstants.SESSION)
+	private Integer pageSize;
 	
 	private int rowIndex;
 	
@@ -147,7 +154,17 @@ public class PagedGrid extends BasicClientElement {
 	@Inject
     private JavaScriptSupport scriptSupport;
 	
-	@Property
+	@Inject
+	private AjaxResponseRenderer ajaxResponseRenderer;
+	
+	@Inject
+	private AssetSource as;
+	
+	@Inject
+	@Symbol(SymbolConstants.PRODUCTION_MODE)
+	private boolean prod;
+	
+	@Property 
 	@Inject @Path("pagedgrid/expand.png")
 	private Asset2 expandImage;
 	
@@ -160,15 +177,15 @@ public class PagedGrid extends BasicClientElement {
 	private Asset2 branchImage;
 	
 	@Property
-	private List<?> children;
+	private GridDataSource childrenSource;
 	
 	@Component(
 			inheritInformalParameters=true,
-			publishParameters="row,columnIndex,include,exclude,model,sortModel,nonSortable,pagerposition",
+			publishParameters="row,rowclass,columnIndex,include,exclude,model,sortModel,nonSortable,pagerposition",
 			parameters = {
 					"source=pagedsource",
                     "add=prop:addedRow",
-                    "rowsPerPage=prop:selectedrowsperpage",
+                    "rowsPerPage=pageSize",
                     "rowIndex=rowIndex",
                     "reorder=prop:ordering",
                     "overrides=customoverrides",
@@ -188,18 +205,29 @@ public class PagedGrid extends BasicClientElement {
     private PagedGridPager pagedpager;
 
 	@SetupRender
-	private void checkParameters() {
+	private void checkParameters(MarkupWriter writer) {
 		if (pagination.size() == 0) { throw new TapestryException("Specify at least one pagination value!",null);}
 		checkedItems = new HashMap<Object, Boolean>();
+		if (pageSize == null) {
+			if (rowsPerPage == null) { // if not defined
+				rowsPerPage = pagination.get(0).intValue();
+			}
+			pageSize = rowsPerPage; 
+		}
 	}
 	
 	@AfterRender
     private void afterRender(MarkupWriter writer) {
+		if (prod) {
+			scriptSupport.importJavaScriptLibrary(as.getUnlocalizedAsset("nl/intercommit/weaves/jquery/fixedheadertable.min.js"));
+		} else {
+			scriptSupport.importJavaScriptLibrary(as.getUnlocalizedAsset("nl/intercommit/weaves/jquery/fixedheadertable.js"));
+		}
+		scriptSupport.addScript("initializeGrid('"+getClientId()+"',"+maxHeight+");");
 		if (pagedsource.getAvailableRows() != 0) {
 			if (tree) {
-				scriptSupport.addScript("observeExpansionZone();");
+				scriptSupport.addScript("observeExpansionZone('"+getClientId()+"');");
 			}
-			scriptSupport.addScript("initializeGrid('"+getClientId()+"',"+maxHeight+");");
 		}
 		if (hoverAnimation) {
 			scriptSupport.addScript("enableHovering(true);");
@@ -212,7 +240,7 @@ public class PagedGrid extends BasicClientElement {
     }
 
 	public int getRowIndex() {
-		return rowIndex + (grid.getCurrentPage() - 1) * getSelectedRowsPerPage()+1;
+		return rowIndex + (grid.getCurrentPage() - 1) * pageSize+1;
 	}
 
 	public void setRowIndex(int rowIndex) {
@@ -248,24 +276,87 @@ public class PagedGrid extends BasicClientElement {
 		return extraRows; // hmm ok, this works
 	}
 	
-	public int getSelectedRowsPerPage() {
-		if (overriddenRowsPerPage == 0) {
-			return pagination.get(0).intValue();
-		}
-		return overriddenRowsPerPage; // the user selected 
-	}
-	
 	@OnEvent(value="pagesize")
 	void onPageSizeFromPagedGrid(int rowsPerPage) {
-		this.overriddenRowsPerPage = rowsPerPage;
+		pageSize = rowsPerPage;
 		grid.setCurrentPage(1); // reset to page1
-	}	
+	}
 	
 	@OnEvent(value="fetchChildren")
-	Block fetchChildren(long rowId) {
-		children = pagedsource.fetchChildren(rowId);
-		return expansionZone.getBody();
+	void fetchChildren(final Object rowId) {
+		
+		ajaxResponseRenderer.addCallback(new JavaScriptCallback() {
+            public void run(JavaScriptSupport javascriptSupport) {
+                javascriptSupport.addScript(
+                    String.format("resetRow('%s');", rowId));
+            }}
+        );
+		
+		resources.triggerEvent(FETCH_CHILDREN_EVENT,new Object[] {rowId}, new ComponentEventCallback<Object>() {
+			
+				@Override
+				public boolean handleResult(final Object result) {
+					if (result instanceof Block) {
+						// this works !, block output is rendered as a single row added to the grid!
+						ajaxResponseRenderer.addRender(new ClientBodyElement() {
+							
+							@Override
+							public String getClientId() {
+								return  expansionZone.getClientId();
+							}
+							
+							@Override
+							public Block getBody() {
+								return (Block) result;
+							}
+						});
+						return true;
+					}
+					if (result instanceof GridDataSource) {
+						// render the children grid
+						ajaxResponseRenderer.addRender(new ClientBodyElement() {
+							
+							@Override
+							public String getClientId() {
+								return  expansionZone.getClientId();
+							}
+							
+							@Override
+							public Block getBody() {
+								return resources.getBlock("childrenGrid");
+							}
+						});
+						childrenSource = (GridDataSource) result;
+						return true;
+					}
+					if (result instanceof Collection<?>) {
+						// also render the children grid
+						ajaxResponseRenderer.addRender(new ClientBodyElement() {
+							
+							@Override
+							public String getClientId() {
+								return  expansionZone.getClientId();
+							}
+							
+							@Override
+							public Block getBody() {
+								return resources.getBlock("childrenGrid");
+							}
+						});
+						childrenSource = new CollectionGridDataSource((Collection<?>) result);
+						return true;
+						
+						
+					}
+					// handle other return results? 
+					return false;
+				}
+			
+			}
+		);
+		
 	}
+	
 			
 	public PropertyOverrides getCustomOverrides() {
 		return new PagedGridOverrides();
@@ -285,7 +376,7 @@ public class PagedGrid extends BasicClientElement {
 				}
 			} else {
 				// rowObject is the actual(real) type and value of the selected item
-				final Object rowObject = context.get(rowIdClass, 0);
+				final Object rowObject = context.get(rowIdClass, 1);
 				/*
 				 * containsKey works with equal and equal does NOT work with Long, which is usually the class
 				 * of a primary hibernate key!
@@ -333,7 +424,7 @@ public class PagedGrid extends BasicClientElement {
 		return grid;
 	}
 	
-	public PagedGridDataSource getPagedSource() {
+	public PagedGridDataSource<T> getPagedSource() {
 		return pagedsource;
 	}
 	
@@ -366,7 +457,10 @@ public class PagedGrid extends BasicClientElement {
 	}
 	
 	public BeanModel<?> getChildModel() {
-		return grid.getDataModel();
+		if (childModel == null) {
+			return grid.getDataModel();
+		}
+		return childModel;
 	}
 	
 	/*
@@ -404,6 +498,4 @@ public class PagedGrid extends BasicClientElement {
 			return resources.getContainerMessages();
 		}
 	}
-
-	
 }

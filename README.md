@@ -1,7 +1,12 @@
-Weaves
+Weaves 3.0.0
 ======
 
-A Tapestry 5.3.x component module featuring new components and adds support for multiple hibernate sessions.
+A Tapestry 5.3.x component module featuring:
+
+  * New or improved components
+  * Support for multiple hibernate sessions
+  * Bootstrap 3 support 
+  * Jquery support 2.0.3
 
 #### Provided components in this library: ####
 
@@ -15,6 +20,8 @@ A Tapestry 5.3.x component module featuring new components and adds support for 
 - DropDownMenu
 - Growler
 - Tabs
+- Chosen
+- EnhancedSelectBox
 
 #### Provided Mixins in this library: ####
 
@@ -23,13 +30,20 @@ A Tapestry 5.3.x component module featuring new components and adds support for 
 
  * OpenTip
     A tooltip based on opentip.org
+    
+ * Bootstrap
+    A mixin to transform standard tapestry components into bootstrapped elements.
 
 #### Provided Services in this library: ####
 
  * HibernateMultiSessionManager
 	A multi session / multi database service
-
-	
+ 
+ * New and improved datasources for the PagedGrid component
+ 	- CollectionPagedGridDataSource
+    - JPAPagedGridDataSource
+    - HibernatePagedGridDataSource
+    
 ### Binaries ###
 
 For those who cannot build the jar themselves, there is a binaries directory in which compiled and packaged jar files are available.
@@ -38,10 +52,6 @@ For those who cannot build the jar themselves, there is a binaries directory in 
 
 Use maven as such: mvn clean install , it will then build and test the library and place it in your local repository. From there you can create a dependency in your own Tapestry project and Weaves will be auto-loaded by Tapestry.
 
-### Testing ###
-
-Currently at around 70% coverage. Still some work to do to increase coverage.
-
 ### DEMO ###
 
-A working demo can be found at: http://intercommitweavesdemo.intercommit.cloudbees.net/
+A working demo can be found at: http://intercommitweavesdemo.intercommit.cloudbees.net/, the demo runs on tomcat7 with JAVA7

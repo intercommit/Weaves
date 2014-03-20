@@ -37,8 +37,9 @@ public class WeavesTestModule {
 	public void contributeSessionFactorySource(MappedConfiguration<String,SessionFactoryConfiguration> configuration) {
 		try {
 			final File configFile = new File(this.getClass().getResource("/factory1.cfg.xml").toURI());
-			final SessionFactoryConfiguration factory1Config = new SessionFactoryConfiguration(new String[] {"nl.intercommit.tapestry.test.entities"},configFile);
+			final SessionFactoryConfiguration factory1Config = new SessionFactoryConfiguration(new String[] {"nl.intercommit.weaves.test.entities"},configFile);
 			configuration.add("Factory1",factory1Config);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TapestryException("Could not initialize session factory due to: ["+e.getMessage()+"]",e);

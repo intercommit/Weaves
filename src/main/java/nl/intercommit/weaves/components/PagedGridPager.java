@@ -1,4 +1,4 @@
-/*  Copyright 2011 InterCommIT b.v.
+/*  Copyright 2014 InterCommIT b.v.
 *
 *  This file is part of the "Weaves" project hosted on https://github.com/intercommit/Weaves
 *
@@ -30,6 +30,7 @@ import org.apache.tapestry5.dom.Element;
 import org.apache.tapestry5.internal.InternalConstants;
 import org.apache.tapestry5.ioc.Messages;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.AssetSource;
 
 /**
@@ -70,9 +71,76 @@ public class PagedGridPager
     @Inject
     private AssetSource as;
     
+    @Inject
+	@Symbol(nl.intercommit.weaves.SymbolConstants.BOOTSTRAP_ENABLED)
+	private boolean bootstrap;
+    
     void beginRender(final MarkupWriter writer)
     {
-        writer.element("div", "class", "t-data-grid-pager");
+    	if (bootstrap) {
+    		writeBootStrappedPager(writer);
+    	} else {
+    		writeTapestryPager(writer);
+    	}
+    }
+    
+    /*
+     * http://getbootstrap.com/components/#pagination
+     */
+    private void writeBootStrappedPager(final MarkupWriter writer) {
+    	writer.element("ul","class","pagination");
+    	
+    	 if (currentPage> 1) {
+    		 writer.element("li");
+    		 writer.element("a", "href",resources.createEventLink(EventConstants.ACTION, currentPage-1));
+    		 writer.write("<<");
+    		 writer.end();
+    		 writer.end();
+    	 } else {
+    		 writer.element("li","class","disabled");
+    		 writer.element("a", "href","#");
+    		 writer.write("<<");
+    		 writer.end();
+    		 writer.end();
+    	 }
+    	 if (hasNextPage) {
+    		 writer.element("li");
+    		 writer.element("a", "href",resources.createEventLink(EventConstants.ACTION, currentPage+1));
+    		 writer.write(">>");
+    		 writer.end();
+    		 writer.end();
+    	 } else {
+    		 writer.element("li","class","disabled");
+    		 writer.element("a", "href","#");
+    		 writer.write(">>");
+    		 writer.end();
+    		 writer.end();
+    	 }
+    	 writer.element("li");
+		 writer.element("a", "href",resources.createEventLink(EventConstants.ACTION, currentPage));
+		 writer.element("span","class","glyphicon glyphicon-refresh");
+		 writer.end();
+		 writer.write(" refresh");
+		 writer.end();
+		 writer.end();
+    	 
+		 // dropdown pagesize selector..// fuckina
+		 writer.element("li","class","dropdown");
+		 writer.writeRaw("<a href=\"#\" data-toggle=\"dropdown\" class=\"dropdown-toggle\"><b class=\"caret\"></b> pagesize <span class=\"badge\">"+rowsPerPage+"</span></a>" +
+				 "<ul class=\"dropdown-menu\">");
+		 for (final Long pagesize: pagination) {
+			 final Link link = resources.getContainer().getComponentResources().createEventLink("pagesize",pagesize);
+			 writer.writeRaw("<li><a href=\""+link+"\">"+pagesize+"</a></li>");
+		 }
+		 writer.writeRaw("</ul>");
+		 writer.end(); // li
+    	 writer.end(); // ul
+    }
+    
+    
+    private void writeTapestryPager(final MarkupWriter writer) {
+    	
+    	writer.element("div", "class", "t-data-grid-pager");
 
         final Element divElement = writer.element("div", 
         							"class","paged_navigation",
@@ -139,8 +207,7 @@ public class PagedGridPager
     /**
      * Normal, non-Ajax event handler.
      */
-    void onAction(final int newPage)
-    {
+    void onAction(final int newPage) {
         currentPage = newPage;
     }
     

@@ -22,7 +22,7 @@ var noticeOptions = {
 	,speedin: 			0.3
 	,speedout: 			0.5
 	,outDirection: 		{ y: -20 }
-	,life: 				5
+	,life: 				0
 	,sticky: 			false
 	,className: 		""
 };
@@ -98,8 +98,10 @@ function createNotice(growler, msg, options){
 	growler.insert(notice);
 	new Effect.Opacity(notice, { to: 0.90, duration: opt.speedin });
 
-	// allways add removal timer
-	removeNotice.delay(opt.life, notice, opt);
+	//ICTAP-13
+	if (opt.life !=0) {
+		removeNotice.delay(opt.life, notice, opt);
+	}
 	
 	notice.fire("notice:created");
 	return notice;
@@ -116,7 +118,7 @@ k.Growler = Class.create({
 		options = options || {};
 		Object.extend(opt, options);
 		this.growler = new Element("div", { "class": "Growler", "id": "Growler" });
-		this.growler.setStyle({ position: ((IE==6)?"absolute":"fixed"), padding: "10px", "width": opt.width, "z-index": "50000" });
+		this.growler.setStyle({ position: ((IE==6)?"absolute":"fixed"), padding: "10px", "width": opt.width, "zIndex": "50000" });
 		if(IE==6){
 			var offset = { w: parseInt(this.growler.style.width)+parseInt(this.growler.style.padding)*3, h: parseInt(this.growler.style.height)+parseInt(this.growler.style.padding)*3 };
 			switch(opt.location){
@@ -156,7 +158,7 @@ k.Growler = Class.create({
 					this.growler.setStyle({bottom: 0, left: "25%", width: "50%"});
 					break;
 				default:
-					this.growler.setStyle({top: 0, right: 0});
+					this.growler.setStyle({top: 0, right: "20px"});
 					break;
 			}
 		}

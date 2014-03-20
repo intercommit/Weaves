@@ -1,4 +1,5 @@
-<div class="weaves-pagedgrid" xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd">
+<div class="weaves-pagedgrid" xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd" xmlns:p="tapestry:parameter">
+
 	<div t:id="grid" id="${clientid}"/>
 	
 	<div id="noGridBottom"/>
@@ -15,7 +16,7 @@
 	</t:block>
 	
 	<t:block id="checkboxHeader">
-		<t:form><t:ck.AjaxCheckbox value="literal:false" t:id="checkall"/></t:form> 
+		<t:form><t:ck.AjaxCheckbox value="literal:false" t:id="checkall" onCompleteCallback="updateRibbon"/></t:form> 
 	</t:block>
 
   	<t:block>
@@ -32,23 +33,12 @@
 		 </div>
 		 <div class="contracter weaves-pagedgrid-hidden">
 		 	<a href="#">
-		 		<t:any t:id="closeChild" t:mixins="weaves/CallBack" t:callback="closeChildren"><img src="${collapseImage}"/></t:any>
+		 		<t:any t:id="closeChild" t:mixins="weaves/CallBack" t:callback="closeChildren" t:clickContext="'${rowIdentifier}'"><img src="${collapseImage}"/></t:any>
 		 	</a>
 		</div>
 	</t:block>
 	
 	<t:zone t:id="expansionZone" id="expansionZone" style="display: none;" show="none" update="none">
-		<t:if test="children">
-			<t:grid t:id="childrenGrid" id="childrenGrid" clientId="childrenGrid" source="children" model="childmodel" rowclass="literal:child" overrides="childOverrides" row="grid.row" pagerPosition="NONE" rowsPerPage="999">
-				<t:parameter name="checkboxHeader">
-					<div style="visibility: hidden;">
-					<form>
-						<input type="checkbox" class="input"/>
-					</form>
-					</div>
-				</t:parameter>
-			</t:grid>
-		</t:if>
 	</t:zone>
 	
 	<t:zone t:id="somezone" id="somezone"/>
@@ -56,4 +46,19 @@
 	<t:block t:id="expanderCellChild">
 		<img src="${branchImage}"/>
 	</t:block>
+	
+	<t:block t:id="childrenGrid">
+		<t:if test="childrenSource">
+			<t:grid t:id="childrenGrid" id="childrenGrid" clientId="childrenGrid" source="childrenSource" model="childmodel" rowclass="literal:child" overrides="childOverrides" row="grid.row" pagerPosition="NONE" rowsPerPage="999">
+				<p:checkboxHeader>
+					<div style="visibility: hidden;">
+					<form>
+						<input type="checkbox" class="input"/>
+					</form>
+					</div>
+				</p:checkboxHeader>
+			</t:grid>
+		</t:if>
+	</t:block>
+	
 </div>

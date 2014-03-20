@@ -1,4 +1,4 @@
-/*  Copyright 2011 InterCommIT b.v.
+/*  Copyright 2014 InterCommIT b.v.
 *
 *  This file is part of the "Weaves" project hosted on https://github.com/intercommit/Weaves
 *
@@ -39,13 +39,14 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * Growler-like user feedback based on: https://github.com/prtksxna/growl-prototype/
  * 
  * TODO: Support for zone updates.
+ * 
  * @tapestrydoc
  */
 @Import(stylesheet={"growler/Growler.css"},library={"growler/Growler.js"})
 public class Growler {
 
 	@SessionState(create=false)
-	private List<nl.intercommit.weaves.growler.Message> _msgs;
+	private List<Message> _msgs;
 	
 	@Inject
 	private JavaScriptSupport js;
@@ -67,19 +68,21 @@ public class Growler {
 			for (Message msg: _msgs) {
 				switch(msg.getLevel()) {
 					case ERROR:{ 
-						imageUrl = errorimage.toClientURL(); 
+						imageUrl = errorimage.toClientURL();
+						js.addScript("growl."+msg.getLevel().name().toLowerCase()+"('"+StringEscapeUtils.escapeJavaScript(URLDecoder.decode(msg.getMessage()))+"',{ className: 'atwork', image: '"+imageUrl+"', sticky: true});", "");
 						break;
 					}
 					case INFO: {
 						imageUrl = infoimage.toClientURL(); 
+						js.addScript("growl."+msg.getLevel().name().toLowerCase()+"('"+StringEscapeUtils.escapeJavaScript(URLDecoder.decode(msg.getMessage()))+"',{ className: 'atwork', image: '"+imageUrl+"', sticky: true,life: 3});", "");
 						break;
 					}
 					case WARN: {
 						imageUrl = warnimage.toClientURL(); 
+						js.addScript("growl."+msg.getLevel().name().toLowerCase()+"('"+StringEscapeUtils.escapeJavaScript(URLDecoder.decode(msg.getMessage()))+"',{ className: 'atwork', image: '"+imageUrl+"', sticky: true,life: 5});", "");
 						break;
 					}
 				}
-				js.addScript("growl."+msg.getLevel().name().toLowerCase()+"('"+StringEscapeUtils.escapeJavaScript(URLDecoder.decode(msg.getMessage()))+"',{ className: 'atwork', image: '"+imageUrl+"', sticky: true,life: 3});", "");
 			}
 			_msgs.clear();
 		}

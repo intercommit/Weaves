@@ -1,4 +1,4 @@
-/*  Copyright 2011 InterCommIT b.v.
+/*  Copyright 2014 InterCommIT b.v.
 *
 *  This file is part of the "Weaves" project hosted on https://github.com/intercommit/Weaves
 *
@@ -26,19 +26,21 @@ import java.util.List;
 
 import nl.intercommit.weaves.menu.MenuItem;
 
+import org.apache.tapestry5.Asset2;
+import org.apache.tapestry5.Block;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.annotations.BeginRender;
-import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.Parameter;
+import org.apache.tapestry5.annotations.Path;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
  * @tapestrydoc
  */
-@Import(library="DropDownMenu.js",stylesheet="DropDownMenu.css")
 public class DropDownMenu {
 
 	// linkedhashmaps to preserve ordering!
@@ -48,8 +50,21 @@ public class DropDownMenu {
 	@Inject
 	private JavaScriptSupport js;
 	
+	@Inject @Path("dropdown/DropDownMenu.js")
+	private Asset2 dropDownJS;
+	
+	@Inject @Path("dropdown/DropDownMenu-T5.css")
+	private Asset2 dropDownCSST5;
+	
+	@Inject @Path("dropdown/DropDownMenu-BS.css")
+	private Asset2 dropDownCSSBS;
+	
 	@Inject
 	private ComponentResources cr;
+	
+	@Inject
+	@Symbol(nl.intercommit.weaves.SymbolConstants.BOOTSTRAP_ENABLED)
+	private boolean bootstrap;
 	
 	@Property
 	private MenuItem level1;
@@ -64,8 +79,14 @@ public class DropDownMenu {
 
 	@SetupRender
 	private void initJavaScript() {
-		js.addScript("initMenu();", "");
-	}
+		if (!bootstrap) {
+			js.importJavaScriptLibrary(dropDownJS);
+			js.importStylesheet(dropDownCSST5);
+			js.addScript("initMenu();", "");
+		} else {
+			js.importStylesheet(dropDownCSSBS);
+		}
+	} 
 
 	public List<MenuItem> getMenuBar() {
 		if (getHasLevel1()) {
@@ -149,9 +170,20 @@ public class DropDownMenu {
 	
 	public String getSelectedclass() {
 		if (level1.equals(selectedLevel)) {
-			return "toplevelselected";
+			if (!bootstrap) {
+				return "toplevelselected";
+			} else {
+				return "active";
+			}
 		}
 		return "none";
 	}
 	
+	public Block getMenuBlock() {
+		if (bootstrap) {
+			return cr.getBlock("bootstrap");
+		} else {
+			return cr.getBlock("classic");
+		}
+	}
 }

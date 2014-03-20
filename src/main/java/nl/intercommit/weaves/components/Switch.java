@@ -1,4 +1,4 @@
-/*  Copyright 2011 InterCommIT b.v.
+/*  Copyright 2014 InterCommIT b.v.
 *
 *  This file is part of the "Weaves" project hosted on https://github.com/intercommit/Weaves
 *
@@ -29,6 +29,7 @@ import org.apache.tapestry5.ioc.annotations.Inject;
 /**
  * A switch component for enum types or anything based on a object array
  * Items in the list should have a decent toString method
+ * 
  * @tapestrydoc
  */
 @SupportsInformalParameters

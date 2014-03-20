@@ -1,4 +1,4 @@
-/*  Copyright 2011 InterCommIT b.v.
+/*  Copyright 2014 InterCommIT b.v.
 *
 *  This file is part of the "Weaves" project hosted on https://github.com/intercommit/Weaves
 *
@@ -18,32 +18,33 @@
 */
 package nl.intercommit.weaves.grid;
 
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.grid.GridDataSource;
 import org.apache.tapestry5.grid.SortConstraint;
-import org.apache.tapestry5.ioc.internal.util.TapestryException;
 
 /**
  * Paged implementation of a GridDataSource,
  * 
  * Warning: the preparedResults are internally (Tapestry) cached, each request for a row will return a new implementation of THIS class.
  * Meaning that you cannot store any values in this class!
+ * 
+ * 
  *
  */
-public abstract class PagedGridDataSource implements GridDataSource {
+public abstract class PagedGridDataSource<T> implements GridDataSource {
 
-	protected ChildrenFetcher fetcher;
-	
 	@Persist
 	private int startIndex;
 	
-	private List<?> preparedResults;
+	private List<T> preparedResults;
 	
-	private final Class<?> entityType;
+	private final Class<T> entityType;
 	
-	public PagedGridDataSource(final Class<?> entityType) {
+	public PagedGridDataSource(final Class<T> entityType) {
 		this.entityType = entityType;
 	}
 	
@@ -54,7 +55,7 @@ public abstract class PagedGridDataSource implements GridDataSource {
 		return preparedResults.size();
 	}
 
-	public Class<?> getRowType() {
+	public Class<T> getRowType() {
 		return entityType;
 	}
 	
@@ -70,18 +71,26 @@ public abstract class PagedGridDataSource implements GridDataSource {
 		assert sortConstraints != null;
 		this.startIndex = startIndex;
 		final int endIndexPlusOne = endIndex + 1;// always try to retrieve on record more
-		preparedResults = fetchResult(startIndex, endIndexPlusOne, sortConstraints);
+		final List<SortConstraint> constraints = ListUtils.sum(sortConstraints, addAdditionalSorting());
+		preparedResults = (List<T>) fetchResult(startIndex, endIndexPlusOne, constraints);
 	}
 	
-	public abstract List<?> fetchResult(int startIndex,int endIndexPlusOne,List<SortConstraint> sortConstraints);
+	public abstract List<T> fetchResult(int startIndex,int endIndexPlusOne,List<SortConstraint> constraints);
 	
-	public List<?> fetchChildren(final long rowId) {
-		if (fetcher != null) {
-			return fetcher.fetchChildren(rowId);
-		}
-		throw new TapestryException("Could not fetch children for 'PagedGridDataSource', no fetcher specified!",this,null);
-	}
-
+	/**
+	 * OVerride if extra sorting is needed.
+	 * 
+	 * @param constraints
+	 */
+	public List<SortConstraint> addAdditionalSorting() {
+		return Collections.emptyList();
+	};
+	
+	/**
+	 * Override if extra filtering is needed, for a menu for example
+	 */
+	public void applyFiltering() {};
+	
 	/**
 	 * Should return a value identifying the current checked row
 	 * 

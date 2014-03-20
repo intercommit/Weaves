@@ -1,4 +1,4 @@
-/*  Copyright 2011 InterCommIT b.v.
+/*  Copyright 2014 InterCommIT b.v.
 *
 *  This file is part of the "Weaves" project hosted on https://github.com/intercommit/Weaves
 *
@@ -18,9 +18,13 @@
 */
 package nl.intercommit.weaves.grid;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityExistsException;
+
 import org.apache.tapestry5.grid.SortConstraint;
+import org.apache.tapestry5.ioc.internal.util.TapestryException;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.TransientObjectException;
@@ -32,67 +36,63 @@ import org.hibernate.criterion.Order;
  * Otherwise you can also use composite keys
  *
  */
-public class HibernatePagedGridDataSource extends PagedGridDataSource {
+public class HibernatePagedGridDataSource<T> extends PagedGridDataSource<T> {
 
-	private final Session hibernateSession; 
+	private final Session hibernateSession;
+	private Criteria crit = null;
 	
-	public HibernatePagedGridDataSource(final Session session,final Class<?> entityType) {
+	public HibernatePagedGridDataSource(final Session session,final Class<T> entityType) {
 		super(entityType);
 		hibernateSession = session;
+		if (session.getSessionFactory().getClassMetadata(entityType) == null) {
+			throw new TapestryException("This entity ["+entityType+"] is not managed by the given session", this, new EntityExistsException());
+		}
 	}
 	
-	public List<?> fetchResult(int startIndex, int endIndexPlusOne,
+	public Criteria getCriteria() {
+		if (crit == null) {
+			crit = hibernateSession.createCriteria(getRowType());
+			 
+	        if (hibernateSession.getCacheMode().isGetEnabled()) {
+				crit.setCacheable(true);
+			}
+		}
+		return crit;
+	}
+	
+	public List<T> fetchResult(int startIndex, int endIndexPlusOne,
 			List<SortConstraint> sortConstraints) {
 		
         // We just assume that the property names in the SortContraint match the Hibernate
         // properties.
-
-        final Criteria crit = hibernateSession.createCriteria(getRowType());
+		
+        applyFiltering();
         
-        if (hibernateSession.getCacheMode().isGetEnabled()) {
-			crit.setCacheable(true);
-		}
+        final List<String> orderedFields = new ArrayList<String>();
         
-        applyFiltering(crit);
-        
-        crit.setFirstResult(startIndex).setMaxResults(endIndexPlusOne - startIndex + 1);
-
-        for (final SortConstraint constraint : sortConstraints)
-        {
-
-            final String propertyName = constraint.getPropertyModel().getPropertyName();
-
-            switch (constraint.getColumnSort())
-            {
-
-                case ASCENDING:
-
-                    crit.addOrder(Order.asc(propertyName));
-                    break;
-
-                case DESCENDING:
-                    crit.addOrder(Order.desc(propertyName));
-                    break;
-
-                default:
+        for (final SortConstraint constraint : sortConstraints) {
+        	
+        	final String propertyName = constraint.getPropertyModel().getPropertyName();
+            if (!orderedFields.contains(propertyName)) {
+            	orderedFields.add(propertyName);
+	            switch (constraint.getColumnSort()) {
+	
+	                case ASCENDING:
+	
+	                	getCriteria().addOrder(Order.asc(propertyName));
+	                    break;
+	
+	                case DESCENDING:
+	                	getCriteria().addOrder(Order.desc(propertyName));
+	                    break;
+	
+	                default:
+	            }
             }
         }
-        
-        applyAdditionalSorting(crit);
-
-        return crit.list();
+        getCriteria().setFirstResult(startIndex).setMaxResults(endIndexPlusOne - startIndex + 1);
+        return getCriteria().list();
 	}
-
-	/**
-	 * Overrule if you want to apply filtering
-	 */
-	public void applyFiltering(final Criteria criteria) {};
-
-	/**
-	 * Overrule if you want to apply additional sorting besides the user selected one
-	 */
-	public void applyAdditionalSorting(final Criteria criteria) {};
-	
 	
 	@Override
 	public Object getIdentifierForRowValue(final Object rowObject) {
@@ -103,9 +103,9 @@ public class HibernatePagedGridDataSource extends PagedGridDataSource {
 		}
 		
 	}
-	
+
 	@Override
-	public Class getRowIdClass() {
+	public Class<?> getRowIdClass() {
 		return Long.class;
 	}
 }

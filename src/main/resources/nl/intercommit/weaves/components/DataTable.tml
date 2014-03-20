@@ -1,5 +1,5 @@
-<div xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd">
-	<table id="${clientid}" cellpadding="0" cellspacing="0" border="0" width="100%" class="display">
+<div xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd" xmlns:p="tapestry:parameter">
+	<table id="${clientid}" class="${tableClass}">
 		<thead>
 			<tr>
 				<t:loop source="model.propertynames" value="header">
@@ -19,5 +19,5 @@
     		</t:loop>
 		</tbody>
 	</table>
-	<t:block id="empty">${message:no_more_data}</t:block>
+	<t:block id="empty">${message:no-data-to-display}</t:block>
 </div>
