@@ -376,7 +376,7 @@ public class PagedGrid<T> extends BasicClientElement {
 				}
 			} else {
 				// rowObject is the actual(real) type and value of the selected item
-				final Object rowObject = context.get(rowIdClass, 1);
+				final Object rowObject = context.get(rowIdClass, 0);
 				/*
 				 * containsKey works with equal and equal does NOT work with Long, which is usually the class
 				 * of a primary hibernate key!

@@ -1,0 +1,7 @@
+.settings/
+target/*
+.classpath
+.externalToolBuilders
+.project
+/target
+/.externalToolBuilders
