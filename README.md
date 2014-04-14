@@ -22,6 +22,7 @@ A Tapestry 5.3.x component module featuring:
 - Tabs
 - Chosen
 - EnhancedSelectBox
+- (Bootstrap)Modal
 
 #### Provided Mixins in this library: ####
 

@@ -4,7 +4,7 @@
 	<groupId>nl.intercommit</groupId>
 	<artifactId>weaves</artifactId>
 	<name>Weaves</name>
-	<version>3.0.0</version>
+	<version>3.0.1</version>
 
 	<description>Weaves; a Tapestry 5.3.x component module featuring new components and multiple database support.</description>
 
